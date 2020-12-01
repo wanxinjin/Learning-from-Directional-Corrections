@@ -33,21 +33,28 @@ After you have installed Mosek and its license. Please run _**test_mosek_solver.
 
 ## How to Play the Human-Robot Games?
 
+<table style=" border: none;">
+<tr style="border: none;text-align:center;">
+<td style="border: none; text-align:center;" > 
+  <img src="robotarm_game.png" style="width: 220px;"/>   
+  <p style="margin-top:0.5cm;font-size:15px"> The robot arm game. The goal is to let a human player  teach the robot arm  to learn a valid cost function  by applying incremental directional corrections, such that it successfully moves from the initial condition (current pose)  to  the target position (upward pose) while avoiding the obstacle.  
+   </p>
+</td>
+<td style="border: none; text-align:center;"> 
+  <img src="uav_game.png"  alt="Drawing" style="width: 380px;"/> 
+<p style="margin-top:0.5cm;font-size:15px"> The 6-DoF quadrotor  game. The goal of this game is to let a human player to  teach a 6-DoF quadrotor system to learn a valid control cost function by providing  directional corrections, such that it can successfully fly from the initial position (in bottom left),  pass through a  gate (colored in brown), and finally land on the specified target  (in upper right). </p>
+</td>
+</tr>
+</table>
+
+
+
+
 ### 1. Robot-Arm Game
 You can directly run _**run_robotarm_game.py**_ to enter the two-link robot-arm game.
 
 
-<table style=" border: none;">
-<tr style="border: none;text-align:center;">
-<td style="border: none; text-align:center;" > 
-  <img src="robotarm_game.png" style="width: 250px;"/>   
-  <p style="margin-top:0.5cm;font-size:15px"> The robot arm game. The goal is to let a human player  teach the robot arm  to learn a valid cost function (i.e., the expected weight vector $\boldsymbol{\theta}^*$) by applying incremental directional corrections, such that it successfully moves from the initial condition (current pose)  to  the target position (upward pose) while avoiding the obstacle.  
-   </p>
-</td>
-<td style="border: none; text-align:center;"> 
-</td>
-</tr>
-</table>
+
 
 
 The goal of this game is to let a human player  teach the robot arm  to learn a valid cost function by 
@@ -86,16 +93,7 @@ This process repeats until the robot successfully avoids the obstacle and reache
 You can directly run _**run_uav_game.py**_ to enter the 6-DoF quadrotor game.
 
 
-<table style=" border: none;">
-<tr style="border: none;text-align:center;">
-<td style="border: none; text-align:center;" > 
- <img src="uav_game.png"  alt="Drawing" style="width: 350px;"/> 
-<p style="margin-top:0.5cm;font-size:15px"> The 6-DoF quadrotor  game. The goal of this game is to let a human player to  teach a 6-DoF quadrotor system to learn a valid control cost function (i.e., the expected weight vector $\boldsymbol{\theta}^*$) by providing  directional corrections, such that it can successfully fly from the initial position (in bottom left),  pass through a  gate (colored in brown), and finally land on the specified target  (in upper right). </p>
-</td>
-<td style="border: none; text-align:center;"> 
- </td>
-</tr>
-</table>
+
 
 
 The goal of this game is to let a human player to  teach a 6-DoF quadrotor 
@@ -135,19 +133,7 @@ until the quadrotor successfully flies from the initial position, passes through
 and finally lands on the specified target --- mission accomplished!
 
 
-<table style=" border: none;">
-<tr style="border: none;text-align:center;">
-<td style="border: none; text-align:center;" > 
-  <img src="robotarm_game.png" style="width: 250px;"/>   
-  <p style="margin-top:0.5cm;font-size:15px"> The robot arm game. The goal is to let a human player  teach the robot arm  to learn a valid cost function (i.e., the expected weight vector $\boldsymbol{\theta}^*$) by applying incremental directional corrections, such that it successfully moves from the initial condition (current pose)  to  the target position (upward pose) while avoiding the obstacle.  
-   </p>
-</td>
-<td style="border: none; text-align:center;"> 
-  <img src="uav_game.png"  alt="Drawing" style="width: 350px;"/> 
-<p style="margin-top:0.5cm;font-size:15px"> The 6-DoF quadrotor  game. The goal of this game is to let a human player to  teach a 6-DoF quadrotor system to learn a valid control cost function (i.e., the expected weight vector $\boldsymbol{\theta}^*$) by providing  directional corrections, such that it can successfully fly from the initial position (in bottom left),  pass through a  gate (colored in brown), and finally land on the specified target  (in upper right). </p>
-</td>
-</tr>
-</table>
+
 
  
  # Contact Information and Citation
