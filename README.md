@@ -48,6 +48,7 @@ After you have installed Mosek and its license. Please run _**test_mosek_solver.
    </p>
 </td>
 <td style="border: none; text-align:center;"> 
+  
   <img src="uav_game.png"  alt="Drawing" style="width: 400px;"/> 
 <p style="margin-top:1.5cm;font-size: 5px"> 
 
