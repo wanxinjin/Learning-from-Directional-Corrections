@@ -36,12 +36,12 @@ After you have installed Mosek and its license. Please run _**test_mosek_solver.
 <table style=" border: none;">
 <tr style="border: none;text-align:center;">
 <td style="border: none; text-align:center;" > 
-  <img src="robotarm_game.png" style="width: 220px;"/>   
+  <img src="robotarm_game.png" style="width: 200px;"/>   
   <p style="margin-top:0.5cm;font-size:15px"> The robot arm game. The goal is to let a human player  teach the robot arm  to learn a valid cost function  by applying incremental directional corrections, such that it successfully moves from the initial condition (current pose)  to  the target position (upward pose) while avoiding the obstacle.  
    </p>
 </td>
 <td style="border: none; text-align:center;"> 
-  <img src="uav_game.png"  alt="Drawing" style="width: 380px;"/> 
+  <img src="uav_game.png"  alt="Drawing" style="width: 400px;"/> 
 <p style="margin-top:0.5cm;font-size:15px"> The 6-DoF quadrotor  game. The goal of this game is to let a human player to  teach a 6-DoF quadrotor system to learn a valid control cost function by providing  directional corrections, such that it can successfully fly from the initial position (in bottom left),  pass through a  gate (colored in brown), and finally land on the specified target  (in upper right). </p>
 </td>
 </tr>
