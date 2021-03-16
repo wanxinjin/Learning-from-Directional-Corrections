@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from casadi import *
 import numpy as np
 import cvxpy as cp

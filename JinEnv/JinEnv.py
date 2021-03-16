@@ -17,6 +17,7 @@
 
 '''
 
+#!/usr/bin/env python3
 from casadi import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -107,7 +108,7 @@ class PlaneBall:
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
                         inputs += [event.key]
-                if len(inputs) is not 0:
+                if len(inputs) != 0:
                     inputs += [i]
                     human_interactions += [inputs]
                     print('Human action captured:', inputs)
@@ -515,7 +516,7 @@ class RobotArm:
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
                         inputs += [event.key]
-                if len(inputs) is not 0:
+                if len(inputs) != 0:
                     inputs += [i]
                     human_interactions += [inputs]
                     print('Human action captured:', inputs)
@@ -1252,7 +1253,7 @@ class Quadrotor:
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
                         inputs += [event.key]
-                if len(inputs) is not 0:
+                if len(inputs) != 0:
                     inputs += [num]
                     human_interactions += [inputs]
                     print('Human action captured:', inputs)

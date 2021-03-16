@@ -17,10 +17,6 @@ script can be run directly.
 * **run_robotarm_game.py** : an entry script to the  two-link robot arm game. See the details below.
 * **run_uav_game.py** : an entry script to the  6-DoF quadrotor game. See the details below.
 
-Wanxin:
-When you run the above examples or games, I recommend to use  Pycharm IDE (https://www.jetbrains.com/pycharm/. Version >=2020.2.2), where
-I have tested all the codes and it runs smoothly.
-
 
 ## Dependency Packages
 
@@ -60,7 +56,7 @@ $ python3 test_mosek_solver.py # test mosek
 <table style=" border: none;">
 <tr style="border: none;text-align:center;">
 <td style="border: none; text-align:center;" > 
-  <img src="robotarm_game.png" style="width: 200px;"/>   
+  <img src="doc/robotarm_game.png" style="width: 200px;"/>   
   <p style="margin-top:0.5cm;font-size:10px"> 
   The two-link robot arm game. 
   The goal is to let a human player  
@@ -73,7 +69,7 @@ $ python3 test_mosek_solver.py # test mosek
 </td>
 <td style="border: none; text-align:center;"> 
   
-  <img src="uav_game.png"  alt="Drawing" style="width: 400px;"/> 
+  <img src="doc/uav_game.png"  alt="Drawing" style="width: 400px;"/> 
 <p style="margin-top:1.5cm;font-size: 5px"> 
 
 The 6-DoF quadrotor  game. 
@@ -91,9 +87,10 @@ The 6-DoF quadrotor  game.
 
 ### 1. Two-Link Robot Arm Game
 You can directly run `run_robotarm_game.py` to enter the two-link robot-arm game.
-
-
-
+```
+$ cd <ROOT_DIRECTORY>
+$ python3 run_robotarm_game.py
+```
 
 
 The goal of this game is to let a human player  teach the robot arm  to learn a valid cost function by 
@@ -130,9 +127,10 @@ This process repeats until the robot successfully avoids the obstacle and reache
 
 ### 2. 6-DoF Quadrotor Game
 You can directly run `run_uav_game.py` to enter the 6-DoF quadrotor game.
-
-
-
+```
+$ cd <ROOT_DIRECTORY>
+$ python3 run_uav_game.py
+```
 
 
 The goal of this game is to let a human player to  teach a 6-DoF quadrotor 
