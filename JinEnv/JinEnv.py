@@ -18,6 +18,9 @@
 '''
 
 #!/usr/bin/env python3
+import os
+import sys
+sys.path.append(os.getcwd()+'/lib')
 from casadi import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,7 +33,8 @@ from matplotlib.patches import Circle, PathPatch
 import math
 import time
 from pynput import keyboard
-
+from dataclasses import dataclass, field
+from QuadStates import QuadStates
 
 
 # plane ball
@@ -730,7 +734,7 @@ class Quadrotor:
 
     def initDyn(self, Jx=None, Jy=None, Jz=None, mass=None, l=None, c=None):
         # global parameter
-        g = 10
+        g = 9.81
 
         # parameters settings
         parameter = []
@@ -803,7 +807,13 @@ class Quadrotor:
         self.U = self.T_B
         self.f = vertcat(dr_I, dv_I, dq, dw)
 
-    def initCost(self, wr=None, wv=None, wq=None, ww=None, wthrust=0.1):
+    def initCost(self, QuadDesiredStates: QuadStates, wr=None, wv=None, wq=None, ww=None, wthrust=0.1):
+
+        # load the goal states
+        goal_r_I = np.array(QuadDesiredStates.position)
+        goal_v_I = np.array(QuadDesiredStates.velocity)
+        goal_q = QuadDesiredStates.attitude_quaternion
+        goal_w_B = QuadDesiredStates.angular_velocity
 
         parameter = []
         if wr is None:
@@ -833,21 +843,17 @@ class Quadrotor:
         self.cost_auxvar = vcat(parameter)
 
         # goal position in the world frame
-        goal_r_I = np.array([0, 0, 0])
         self.cost_r_I = dot(self.r_I - goal_r_I, self.r_I - goal_r_I)
 
         # goal velocity
-        goal_v_I = np.array([0, 0, 0])
         self.cost_v_I = dot(self.v_I - goal_v_I, self.v_I - goal_v_I)
 
         # final attitude error
-        goal_q = toQuaternion(0, [0, 0, 1])
         goal_R_B_I = self.dir_cosine(goal_q)
         R_B_I = self.dir_cosine(self.q)
         self.cost_q = trace(np.identity(3) - mtimes(transpose(goal_R_B_I), R_B_I))
 
         # auglar velocity cost
-        goal_w_B = np.array([0, 0, 0])
         self.cost_w_B = dot(self.w_B - goal_w_B, self.w_B - goal_w_B)
 
         # the thrust cost
@@ -879,7 +885,10 @@ class Quadrotor:
             rc = state_traj[t, 0:3]
             # altitude of quaternion
             q = state_traj[t, 6:10]
-            q = q/ numpy.linalg.norm(q)
+
+            # q here is a 1D list, no matter which type state_traj is (numpy 2d array or 2d list)
+            if abs(np.linalg.norm(q)) > 1e-6:
+                q = np.array(q) / np.linalg.norm(q)
 
             # direction cosine matrix from body to inertial
             CIB = np.transpose(self.dir_cosine(q).full())
@@ -1054,19 +1063,23 @@ class Quadrotor:
                        p[0] * q[3] + p[1] * q[2] - p[2] * q[1] + p[3] * q[0]
                        )
 
-    def initFinalCost(self,goal_r_I):
+    def initFinalCost(self, QuadDesiredStates: QuadStates):
+
+        # load the goal states
+        goal_r_I = np.array(QuadDesiredStates.position)
+        goal_v_I = np.array(QuadDesiredStates.velocity)
+        goal_q = QuadDesiredStates.attitude_quaternion
+        goal_w_B = QuadDesiredStates.angular_velocity
+
         # goal aspect
         self.cost_goal_r = dot(self.r_I - goal_r_I, self.r_I - goal_r_I)
         # velocity aspect
-        goal_v_I = np.array([0, 0, 0])
         self.cost_goal_v = dot(self.v_I - goal_v_I, self.v_I - goal_v_I)
         # orientation aspect
-        goal_q = toQuaternion(0, [0, 0, 1])
         goal_R_B_I = self.dir_cosine(goal_q)
         R_B_I = self.dir_cosine(self.q)
         self.cost_goal_q = trace(np.identity(3) - mtimes(transpose(goal_R_B_I), R_B_I))
         # angular aspect
-        goal_w_B = np.array([0, 0, 0])
         self.cost_goal_w = dot(self.w_B - goal_w_B, self.w_B - goal_w_B)
 
         self.final_cost = 1 * self.cost_goal_r + \

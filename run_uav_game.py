@@ -3,6 +3,7 @@ import os
 import sys
 sys.path.append(os.getcwd()+'/LFC')
 sys.path.append(os.getcwd()+'/JinEnv')
+sys.path.append(os.getcwd()+'/lib')
 from LFC import LFC
 from JinEnv import JinEnv
 import numpy as np
@@ -10,7 +11,18 @@ from casadi import *
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import time
+import transforms3d
+from dataclasses import dataclass, field
+from QuadStates import QuadStates
 
+
+# define the desired goal
+R = np.array([[1,0,0],[0,1,0],[0,0,1]]) # rotation matrix in numpy 2D array
+QuadDesiredStates = QuadStates()
+QuadDesiredStates.position = [8, 8, 0]
+QuadDesiredStates.velocity = [0, 0, 0]
+QuadDesiredStates.attitude_quaternion = transforms3d.quaternions.mat2quat(R).tolist()
+QuadDesiredStates.angular_velocity = [0, 0, 0]
 
 env = JinEnv.Quadrotor()
 env.initDyn(Jx=0.5, Jy=0.5, Jz=1, mass=1, l=1, c=0.1)
@@ -18,8 +30,7 @@ env.initDyn(Jx=0.5, Jy=0.5, Jz=1, mass=1, l=1, c=0.1)
 features = vcat([(env.X[0])**2, env.X[0], (env.X[1])**2, env.X[1], (env.X[2])**2, env.X[2], dot(env.U,env.U)])
 weights = SX.sym('weights', features.shape)
 # define the final cost function
-goal_r_I = np.array([8, 8, 0])
-env.initFinalCost(goal_r_I=goal_r_I)
+env.initFinalCost(QuadDesiredStates)
 
 
 # load the oc solver object

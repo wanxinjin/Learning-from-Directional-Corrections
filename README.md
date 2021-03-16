@@ -26,6 +26,9 @@ Please make sure that the following packages have already been installed before 
 * [Pynput](https://pythonhosted.org/pynput/): version >= 1.7.1, used for keyboard interface when run the human-robot games.
 * [Cvxpy](https://www.cvxpy.org/): version >= 1.0.31, used for solving MVE.
 * [Mosek](https://www.mosek.com): version >= 9.2.16, used for solving MVE (core solver). **License Required**
+* [Scipy](https://www.scipy.org/)
+* [Transforms3d](https://pypi.org/project/transforms3d/)
+
 
 Mosek requires a license to use. You can request an academic license `mosek.lic` at https://www.mosek.com/products/academic-licenses/.
 Then place `mosek.lic` inside a folder `mosek` under the user's home directory.
@@ -44,9 +47,10 @@ After you installed Mosek and its license. Please run `test_mosek_solver.py` to 
 
 ```
 $ sudo apt update
-$ pip3 install casadi numpy pynput cvxpy mosek
+$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek
 $ git clone https://github.com/zehuilu/Learning-from-Directional-Corrections.git
 $ cd <ROOT_DIRECTORY>
+$ mkdir trajectories data
 $ python3 test_mosek_solver.py # test mosek
 ```
 
