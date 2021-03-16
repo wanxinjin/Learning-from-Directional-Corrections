@@ -29,7 +29,7 @@ prob.solve(solver=cp.MOSEK, verbose=False)
 
 # print your results
 print(C.value, d.value)
-print('Congratulations, you pass the test and you have correctly installed mosek')
+print("Congratulations! You passed the test and you have correctly installed mosek!")
 
 # if your reults are C.value=[1,0, 0, 1], d.value=[0,0], then great, you have correctly installed mosek
 # otherwise, if you have an error when run, you have not correctly installed it. please check the error to fix it.

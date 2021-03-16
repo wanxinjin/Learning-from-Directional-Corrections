@@ -5,31 +5,55 @@ co-authored by Wanxin Jin, Todd D. Murphey, and Shaoshuai Mou. Please find more 
 * Paper: https://arxiv.org/abs/2011.15014 for technical details.
 * Blog: https://wanxinjin.github.io/posts/lfdc for a brief problem introduction.
 
+This repo has been tested with:
+* Ubuntu 20.04.2 LTS, Python 3.8.5, CasADi 3.5.5, Numpy 1.20.1, Cvxpy 1.1.11, Mosek 9.2.40, Pynput 1.7.3.
 
 ## Project Structure
 The current version of the project consists of following folders or files:
-* _**LFC**_ : a package including an optimal control solver and a maximum volume inscribed ellipsoid (MVE) solver.
-* _**JinEvn**_ : an independent package providing various robot environments to simulate on.
-* _**Simulations**_ : a folder including different simulation examples used in the paper. Each python
+* **LFC** : a package including an optimal control solver and a maximum volume inscribed ellipsoid (MVE) solver.
+* **JinEvn** : an independent package providing various robot environments to simulate on.
+* **Simulations** : a folder including different simulation examples used in the paper. Each python
 script can be run directly. 
-* _**run_robotarm_game.py**_ : an entry script to the  two-link robot arm game. See the details below.
-* _**run_uav_game.py**_ : an entry script to the  6-DoF quadrotor game. See the details below.
+* **run_robotarm_game.py** : an entry script to the  two-link robot arm game. See the details below.
+* **run_uav_game.py** : an entry script to the  6-DoF quadrotor game. See the details below.
+
+Wanxin:
+When you run the above examples or games, I recommend to use  Pycharm IDE (https://www.jetbrains.com/pycharm/. Version >=2020.2.2), where
+I have tested all the codes and it runs smoothly.
 
 
 ## Dependency Packages
 
 Please make sure that the following packages have already been installed before you use the  codes.
-* CasADi: used for solving optimal control. (Version >= 3.5.1. Info: https://web.casadi.org/)
-* Numpy: used for matrix computation. (Version >= 1.18.1. Info: https://numpy.org/)
-* Pynput: used for keyboard interface when run the human-robot games. (Version >=1.7.1. Info: https://pythonhosted.org/pynput/)
-* Cvxpy: used for solving MVE. (Version >= 1.0.31. Info: https://www.cvxpy.org/)
-* Mosek: used for solving MVE (core solver). (Version >=9.2.16. Info: https://www.mosek.com/. NOTE: license required)
+* [CasADi](https://web.casadi.org/): version >= 3.5.1.
+* [Numpy](https://numpy.org/): version >= 1.18.1.
+* [Pynput](https://pythonhosted.org/pynput/): version >= 1.7.1, used for keyboard interface when run the human-robot games.
+* [Cvxpy](https://www.cvxpy.org/): version >= 1.0.31, used for solving MVE.
+* [Mosek](https://www.mosek.com): version >= 9.2.16, used for solving MVE (core solver). **License Required**
 
-When you run the above examples or games, I recommend to use  Pycharm IDE (https://www.jetbrains.com/pycharm/. Version >=2020.2.2), where
-I have tested all the codes and it runs smoothly.
+Mosek requires a license to use. You can request an academic license `mosek.lic` at https://www.mosek.com/products/academic-licenses/.
+Then place `mosek.lic` inside a folder `mosek` under the user's home directory.
 
-Note that Mosek requires a license before to use. You can request an academic license at https://www.mosek.com/products/academic-licenses/.
-After you have installed Mosek and its license. Please run _**test_mosek_solver.py**_ to test if your installed Mosek work properly.
+Example: `_userid_` is your User ID on the computer.
+  * Windows:
+
+    `c:\users\_userid_\mosek\mosek.lic`
+
+  * Unix/OS X:
+
+    `/home/_userid_/mosek/mosek.lic`
+
+After you installed Mosek and its license. Please run `test_mosek_solver.py` to test if your installed Mosek work properly.
+
+
+```
+$ sudo apt update
+$ pip3 install casadi numpy pynput cvxpy mosek
+$ git clone https://github.com/zehuilu/Learning-from-Directional-Corrections.git
+$ cd <ROOT_DIRECTORY>
+$ python3 test_mosek_solver.py # test mosek
+```
+
 
 ## How to Play the Human-Robot Games?
 
@@ -66,7 +90,7 @@ The 6-DoF quadrotor  game.
 
 
 ### 1. Two-Link Robot Arm Game
-You can directly run _**run_robotarm_game.py**_ to enter the two-link robot-arm game.
+You can directly run `run_robotarm_game.py` to enter the two-link robot-arm game.
 
 
 
@@ -105,7 +129,7 @@ This process repeats until the robot successfully avoids the obstacle and reache
 
 
 ### 2. 6-DoF Quadrotor Game
-You can directly run _**run_uav_game.py**_ to enter the 6-DoF quadrotor game.
+You can directly run `run_uav_game.py` to enter the 6-DoF quadrotor game.
 
 
 
