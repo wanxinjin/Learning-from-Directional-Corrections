@@ -13,12 +13,12 @@ This repo has been tested with:
 ## Project Structure
 
 The current version of the project consists of following folders or files:
-* **LFC** : a package including an optimal control solver and a maximum volume inscribed ellipsoid (MVE) solver.
-* **JinEvn** : an independent package providing various robot environments to simulate on.
-* **Simulations** : a directory including different simulation examples used in the paper.
-* **lib** : a library folder including many helper classes.
-* **examples** : a directory including examples about robot arm and quadrotor.
-* **test** : a directory including test files for [Mosek](https://www.mosek.com), and [CasADi](https://web.casadi.org/) with [IPOPT](https://coin-or.github.io/Ipopt/).
+* **LFC**: a package including an optimal control solver and a maximum volume inscribed ellipsoid (MVE) solver.
+* **JinEvn**: an independent package providing various robot environments to simulate on.
+* **Simulations**: a directory including different simulation examples used in the paper.
+* **lib**: a library folder including many helper classes.
+* **examples**: a directory including examples about robot arm and quadrotor.
+* **test**: a directory including test files for [Mosek](https://www.mosek.com), and [CasADi](https://web.casadi.org/) with [IPOPT](https://coin-or.github.io/Ipopt/).
 
 
 ## Dependency Packages
@@ -34,8 +34,7 @@ Please make sure that the following packages have already been installed before 
 * [Transforms3d](https://pypi.org/project/transforms3d/)
 * [PyQt5](https://pypi.org/project/PyQt5/)
 
-Mosek requires a license to use. You can request an academic license `mosek.lic` at https://www.mosek.com/products/academic-licenses/.
-Then place `mosek.lic` inside a folder `mosek` (you may need to create it manually) under the user's home directory.
+Mosek requires a license to use. You can request an academic license `mosek.lic` at https://www.mosek.com/products/academic-licenses/. Then place `mosek.lic` inside a folder `mosek` (you may need to create it manually) under the user's home directory.
 
 Example: `_userid_` is your User ID on the computer.
   * Windows:
@@ -50,7 +49,7 @@ Example: `_userid_` is your User ID on the computer.
 
     `/User/_userid_/mosek/mosek.lic`
 
-After you installed Mosek and its license. Please run [`test/test_mosek_solver.py`](test/test_mosek_solver.py) to test if your installed Mosek work properly.
+You can install [Mosek](https://www.mosek.com) by [pip](https://pip.pypa.io/en/stable/) (an example shown below). You can run [`test/test_mosek_solver.py`](test/test_mosek_solver.py) to test if you installed Mosek work properly.
 
 
 ## Installation
