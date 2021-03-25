@@ -1,22 +1,3 @@
-'''
-# This module is a simulation environment, which provides different-level (from easy to hard)
-# simulation benchmark environments and animation facilities for the user to test their learning algorithm.
-# This environment is versatile to use, e.g. the user can arbitrarily:
-# set the parameters for the dynamics and objective function,
-# obtain the analytical dynamics models, as well as the differentiations.
-# define and modify the control cost function
-# animate the motion of the system.
-
-# Do NOT distribute without written permission from Wanxin Jin
-# Do NOT use it for any commercial purpose
-
-# Contact email: wanxinjin@gmail.com
-# Last update: May. 15, 2020
-
-#
-
-'''
-
 #!/usr/bin/env python3
 import os
 import sys
@@ -35,6 +16,24 @@ import time
 from pynput import keyboard
 from dataclasses import dataclass, field
 from QuadStates import QuadStates
+
+
+'''
+This module is a simulation environment, which provides different-level (from easy to hard)
+simulation benchmark environments and animation facilities for the user to test their learning algorithm.
+This environment is versatile to use, e.g. the user can arbitrarily:
+set the parameters for the dynamics and objective function,
+obtain the analytical dynamics models, as well as the differentiations.
+define and modify the control cost function
+animate the motion of the system.
+
+Do NOT distribute without written permission from Wanxin Jin
+Do NOT use it for any commercial purpose
+
+Contact email: wanxinjin@gmail.com
+Last update: May. 15, 2020
+
+'''
 
 
 # plane ball
@@ -732,6 +731,7 @@ class Quadrotor:
         f1, f2, f3, f4 = SX.sym('f1'), SX.sym('f2'), SX.sym('f3'), SX.sym('f4')
         self.T_B = vertcat(f1, f2, f3, f4)
 
+
     def initDyn(self, Jx=None, Jy=None, Jz=None, mass=None, l=None, c=None):
         # global parameter
         g = 9.81
@@ -807,6 +807,7 @@ class Quadrotor:
         self.U = self.T_B
         self.f = vertcat(dr_I, dv_I, dq, dw)
 
+
     def initCost(self, QuadDesiredStates: QuadStates, wr=None, wv=None, wq=None, ww=None, wthrust=0.1):
 
         # load the goal states
@@ -869,6 +870,7 @@ class Quadrotor:
                           self.ww * self.cost_w_B + \
                           self.wq * self.cost_q
 
+
     def get_quadrotor_position(self, wing_len, state_traj):
 
         # thrust_position in body frame
@@ -907,6 +909,7 @@ class Quadrotor:
             position[t, 12:15] = r4_pos
 
         return position
+
 
     def play_animation(self, wing_len, state_traj, state_traj_ref=None, dt=0.1, save_option=0, title='UAV Maneuvering'):
         fig = plt.figure()
@@ -1031,6 +1034,7 @@ class Quadrotor:
 
         plt.show()
 
+
     def dir_cosine(self, q):
         C_B_I = vertcat(
             horzcat(1 - 2 * (q[2] ** 2 + q[3] ** 2), 2 * (q[1] * q[2] + q[0] * q[3]), 2 * (q[1] * q[3] - q[0] * q[2])),
@@ -1039,6 +1043,7 @@ class Quadrotor:
         )
         return C_B_I
 
+
     def skew(self, v):
         v_cross = vertcat(
             horzcat(0, -v[2], v[1]),
@@ -1046,6 +1051,7 @@ class Quadrotor:
             horzcat(-v[1], v[0], 0)
         )
         return v_cross
+
 
     def omega(self, w):
         omeg = vertcat(
@@ -1056,12 +1062,14 @@ class Quadrotor:
         )
         return omeg
 
+
     def quaternion_mul(self, p, q):
         return vertcat(p[0] * q[0] - p[1] * q[1] - p[2] * q[2] - p[3] * q[3],
                        p[0] * q[1] + p[1] * q[0] + p[2] * q[3] - p[3] * q[2],
                        p[0] * q[2] - p[1] * q[3] + p[2] * q[0] + p[3] * q[1],
                        p[0] * q[3] + p[1] * q[2] - p[2] * q[1] + p[3] * q[0]
                        )
+
 
     def initFinalCost(self, QuadDesiredStates: QuadStates):
 
@@ -1086,6 +1094,7 @@ class Quadrotor:
                           1 * self.cost_goal_v + \
                           100 * self.cost_goal_q + \
                           1 * self.cost_goal_w
+
 
     def human_interface(self,state_traj,obstacles=False):
         # fig = plt.figure()
@@ -1204,9 +1213,6 @@ class Quadrotor:
                 ax.text2D(0.65, 0.7, "FAIL!", transform=ax.transAxes, fontsize=12, weight='bold', color='#A2142F')
 
 
-
-
-
         # allowed key press
         directions = [keyboard.Key.up, keyboard.Key.down,
                       keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s'),
@@ -1271,9 +1277,7 @@ class Quadrotor:
                     human_interactions += [inputs]
                     print('Human action captured:', inputs)
 
-
                 plt.pause(0.01)
-
 
             return human_interactions
 
@@ -1374,6 +1378,7 @@ class Quadrotor:
         #             print('Human action captured:', inputs)
         #         return []
         # plt.show()
+
 
     def interface_interpretation(self,human_interactions,horizon):
         correction_time=[]

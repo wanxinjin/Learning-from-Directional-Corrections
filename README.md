@@ -23,7 +23,7 @@ The current version of the project consists of following folders or files:
 
 ## Dependency Packages
 
-Please make sure that the following packages have already been installed before you use the  codes.
+Please make sure that the following packages have already been installed before you use the codes.
 * [CasADi](https://web.casadi.org/): version >= 3.5.1.
 * [Numpy](https://numpy.org/): version >= 1.18.1.
 * [Pynput](https://pythonhosted.org/pynput/): version >= 1.7.1, used for keyboard interface when run the human-robot games.
@@ -78,7 +78,7 @@ $ # remember to set up MOSEK license
 To make [IPOPT](https://coin-or.github.io/Ipopt/) work with macOS default compiler [Clang](https://clang.llvm.org/), we need [GFortran](https://gcc.gnu.org/wiki/GFortran), which comes with [GCC](https://gcc.gnu.org/). More details see [here](https://projects.coin-or.org/BuildTools/wiki/current-issues).
 ```
 $ brew update
-$ brew install gcc ipopt libomp libxcb
+$ brew install gcc ipopt libomp
 ```
 
 Sometimes [CasADi](https://web.casadi.org/) can't find [GFortran](https://gcc.gnu.org/wiki/GFortran), and returns an error `Cannot load shared library 'libcasadi_nlpsol_ipopt.so'` due to `"Library not loaded: @rpath/libgfortran.4.dylib"`. In this case, you need to manually create a symlink for `libgfortran.4.dylib`. An example is shown below:
@@ -113,7 +113,7 @@ $ python3 test/test_mosek_solver.py # test mosek
 $ python3 test/test_casadi_ipopt.py # test ipopt
 ```
 
-Feel free to start an issue if you have any questions or post your questions/thoughts in [our Discussions channel](https://github.com/zehuilu/Learning-from-Directional-Corrections/discussions). We're happy to help!
+Feel free to start an issue if you have any questions or post your questions/thoughts in our Discussions channel. We're happy to help!
 
 
 ## How to Play the Human-Robot Games?
@@ -191,10 +191,10 @@ This process repeats until the robot successfully avoids the obstacle and reache
 
 
 ### 2. 6-DoF Quadrotor Game
-You can directly run [`examples/run_uav_game.py`](examples/run_uav_game.py) to enter the 6-DoF quadrotor game.
+You can directly run [`examples/run_quad_game.py`](examples/run_quad_game.py) to enter the 6-DoF quadrotor game.
 ```
 $ cd <ROOT_DIRECTORY>
-$ python3 examples/run_uav_game.py
+$ python3 examples/run_quad_game.py
 ```
 
 

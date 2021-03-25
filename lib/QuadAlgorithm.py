@@ -4,10 +4,10 @@ import sys
 sys.path.append(os.getcwd()+'/LFC')
 sys.path.append(os.getcwd()+'/JinEnv')
 sys.path.append(os.getcwd()+'/lib')
-from LFC import LFC
-from JinEnv import JinEnv
-import numpy as np
+import LFC
+import JinEnv
 from casadi import *
+import numpy as np
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import time
@@ -98,6 +98,7 @@ class QuadAlgorithm(object):
 
             if not human_interface:
                 self.weights_trace.append(current_guess)
+                print("No human corrections. Repeat the previous one.")
             else:
                 correction, correction_time = self.env.interface_interpretation(human_interface, horizon)
                 self.corrections_trace.append(correction)

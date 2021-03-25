@@ -4,8 +4,8 @@ import sys
 sys.path.append(os.getcwd()+'/LFC')
 sys.path.append(os.getcwd()+'/JinEnv')
 sys.path.append(os.getcwd()+'/lib')
-from LFC import LFC
-from JinEnv import JinEnv
+import LFC
+import JinEnv
 import numpy as np
 from casadi import *
 import matplotlib.pyplot as plt
