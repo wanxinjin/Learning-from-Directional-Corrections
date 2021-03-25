@@ -3,3 +3,4 @@
 /.idea/*
 JinEnv/__pycache__/*
 LFC/__pycache__/*
+lib/__pycache__/*

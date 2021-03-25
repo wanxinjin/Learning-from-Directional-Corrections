@@ -7,15 +7,18 @@ co-authored by Wanxin Jin, Todd D. Murphey, and Shaoshuai Mou. Please find more 
 
 This repo has been tested with:
 * Ubuntu 20.04.2 LTS, Python 3.8.5, CasADi 3.5.5, Numpy 1.20.1, Cvxpy 1.1.11, Mosek 9.2.40, Pynput 1.7.3.
+* macOS 11.2.3, Python 3.9.2, CasADi 3.5.5, Numpy 1.20.1, Cvxpy 1.1.11, Mosek 9.2.40, IPOPT 3.13.4, Pynput 1.7.3.
+
 
 ## Project Structure
+
 The current version of the project consists of following folders or files:
 * **LFC** : a package including an optimal control solver and a maximum volume inscribed ellipsoid (MVE) solver.
 * **JinEvn** : an independent package providing various robot environments to simulate on.
-* **Simulations** : a folder including different simulation examples used in the paper. Each python
-script can be run directly. 
-* **run_robotarm_game.py** : an entry script to the  two-link robot arm game. See the details below.
-* **run_uav_game.py** : an entry script to the  6-DoF quadrotor game. See the details below.
+* **Simulations** : a directory including different simulation examples used in the paper.
+* **lib** : a library folder including many helper classes.
+* **examples** : a directory including examples about robot arm and quadrotor.
+* **test** : a directory including test files for [Mosek](https://www.mosek.com), and [CasADi](https://web.casadi.org/) with [IPOPT](https://coin-or.github.io/Ipopt/).
 
 
 ## Dependency Packages
@@ -24,35 +27,94 @@ Please make sure that the following packages have already been installed before 
 * [CasADi](https://web.casadi.org/): version >= 3.5.1.
 * [Numpy](https://numpy.org/): version >= 1.18.1.
 * [Pynput](https://pythonhosted.org/pynput/): version >= 1.7.1, used for keyboard interface when run the human-robot games.
+* [IPOPT](https://coin-or.github.io/Ipopt/): need this for solving NLP in CasADi, the binary installation is okay.
 * [Cvxpy](https://www.cvxpy.org/): version >= 1.0.31, used for solving MVE.
 * [Mosek](https://www.mosek.com): version >= 9.2.16, used for solving MVE (core solver). **License Required**
 * [Scipy](https://www.scipy.org/)
 * [Transforms3d](https://pypi.org/project/transforms3d/)
-
+* [PyQt5](https://pypi.org/project/PyQt5/)
 
 Mosek requires a license to use. You can request an academic license `mosek.lic` at https://www.mosek.com/products/academic-licenses/.
-Then place `mosek.lic` inside a folder `mosek` under the user's home directory.
+Then place `mosek.lic` inside a folder `mosek` (you may need to create it manually) under the user's home directory.
 
 Example: `_userid_` is your User ID on the computer.
   * Windows:
 
     `c:\users\_userid_\mosek\mosek.lic`
 
-  * Unix/OS X:
+  * Linux:
 
     `/home/_userid_/mosek/mosek.lic`
 
-After you installed Mosek and its license. Please run `test_mosek_solver.py` to test if your installed Mosek work properly.
+  * macOS:
+
+    `/User/_userid_/mosek/mosek.lic`
+
+After you installed Mosek and its license. Please run [`test/test_mosek_solver.py`](test/test_mosek_solver.py) to test if your installed Mosek work properly.
 
 
+## Installation
+
+* For Linux:
 ```
 $ sudo apt update
-$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek
+$ sudo apt install build-essential coinor-libipopt-dev libxcb-xinerama0
+$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek pyqt5
 $ git clone https://github.com/zehuilu/Learning-from-Directional-Corrections.git
 $ cd <ROOT_DIRECTORY>
 $ mkdir trajectories data
-$ python3 test_mosek_solver.py # test mosek
+$ python3 test/test_mosek_solver.py # test mosek
+$ python3 test/test_casadi_ipopt.py # test ipopt
 ```
+
+
+* For macOS:
+```
+$ brew update
+$ brew install libxcb
+$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek pyqt5
+$ # remember to set up MOSEK license
+```
+
+To make [IPOPT](https://coin-or.github.io/Ipopt/) work with macOS default compiler [Clang](https://clang.llvm.org/), we need [GFortran](https://gcc.gnu.org/wiki/GFortran), which comes with [GCC](https://gcc.gnu.org/). More details see [here](https://projects.coin-or.org/BuildTools/wiki/current-issues).
+```
+$ brew update
+$ brew install gcc ipopt libomp libxcb
+```
+
+Sometimes [CasADi](https://web.casadi.org/) can't find [GFortran](https://gcc.gnu.org/wiki/GFortran), and returns an error `Cannot load shared library 'libcasadi_nlpsol_ipopt.so'` due to `"Library not loaded: @rpath/libgfortran.4.dylib"`. In this case, you need to manually create a symlink for `libgfortran.4.dylib`. An example is shown below:
+
+First, search a specific directory to make sure you do have `libgfortran.X.dylib` (`X` is your `libgfortran`'s version):
+```
+$ grep -l 'libgfortran' /usr/local/Cellar/gcc/<GCC_VERSION>/lib/gcc/<GCC_VERSION_FIRST_SECTION>/**
+$ # example: grep -l 'libgfortran' /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/**
+```
+If you see some files includes `libgfortran.X.dylib`, for example:
+```
+grep: /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/gcc: Is a directory
+/usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libgfortran.5.dylib
+/usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libgfortran.a
+/usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libgfortran.dylib
+```
+
+Then continue with the following instructions. If not, try to install [GCC](https://gcc.gnu.org/) first.
+
+Let's say you have `libgfortran.5.dylib` (or generally `libgfortran.X.dylib`) but [CasADi](https://web.casadi.org/) cannot load `libgfortran.4.dylib`, then you need to create a symlink in a specific directory `/usr/local/lib/`, which links to `libgfortran.X.dylib`. (The backward compatibility should be fine.)
+```
+$ ln /usr/local/Cellar/gcc/<GCC_VERSION>/lib/gcc/<GCC_VERSION_FIRST_SECTION>/libgfortran.X.dylib /usr/local/lib/libgfortran.4.dylib
+$ # example: ln /usr/local/Cellar/gcc/10.2.0_4/lib/gcc/10/libgfortran.5.dylib /usr/local/lib/libgfortran.4.dylib
+```
+
+Finally, run [`test/test_casadi_ipopt.py`](test/test_casadi_ipopt.py) to test if [IPOPT](https://coin-or.github.io/Ipopt/) works correctly with [CasADi](https://web.casadi.org/).
+```
+$ git clone https://github.com/zehuilu/Learning-from-Directional-Corrections.git
+$ cd <ROOT_DIRECTORY>
+$ mkdir trajectories data
+$ python3 test/test_mosek_solver.py # test mosek
+$ python3 test/test_casadi_ipopt.py # test ipopt
+```
+
+Feel free to start an issue or post your questions/thoughts in [our Discussions channel](https://github.com/zehuilu/Learning-from-Directional-Corrections/discussions) if you have any questions. We're happy to help!
 
 
 ## How to Play the Human-Robot Games?
@@ -90,10 +152,10 @@ The 6-DoF quadrotor  game.
 
 
 ### 1. Two-Link Robot Arm Game
-You can directly run `run_robotarm_game.py` to enter the two-link robot-arm game.
+You can directly run [`examples/run_robotarm_game.py`](examples/run_robotarm_game.py) to enter the two-link robot-arm game.
 ```
 $ cd <ROOT_DIRECTORY>
-$ python3 run_robotarm_game.py
+$ python3 examples/run_robotarm_game.py
 ```
 
 
@@ -130,10 +192,10 @@ This process repeats until the robot successfully avoids the obstacle and reache
 
 
 ### 2. 6-DoF Quadrotor Game
-You can directly run `run_uav_game.py` to enter the 6-DoF quadrotor game.
+You can directly run [`examples/run_uav_game.py`](examples/run_uav_game.py) to enter the 6-DoF quadrotor game.
 ```
 $ cd <ROOT_DIRECTORY>
-$ python3 run_uav_game.py
+$ python3 examples/run_uav_game.py
 ```
 
 
@@ -173,14 +235,19 @@ This process repeats
 until the quadrotor successfully flies from the initial position, passes through the  gate, 
 and finally lands on the specified target --- mission accomplished!
 
-
-
-
  
- # Contact Information and Citation
+## Contact Information and Citation
  
 If you have encountered an issue in your use of the codes/games (the codes are under regularly update), please feel free to let me known via email:
 * Name: Wanxin Jin (he/his)
 * Email: wanxinjin@gmail.com 
 
 If you find this project/paper helpful in your research, please consider citing our paper.
+```
+@article{jin2020learning,
+  title={Learning from Incremental Directional Corrections},
+  author={Jin, Wanxin and Murphey, Todd D and Mou, Shaoshuai},
+  journal={arXiv preprint arXiv:2011.15014},
+  year={2020}
+}
+```
