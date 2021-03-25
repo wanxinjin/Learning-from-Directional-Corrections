@@ -113,7 +113,7 @@ $ python3 test/test_mosek_solver.py # test mosek
 $ python3 test/test_casadi_ipopt.py # test ipopt
 ```
 
-Feel free to start an issue or post your questions/thoughts in [our Discussions channel](https://github.com/zehuilu/Learning-from-Directional-Corrections/discussions) if you have any questions. We're happy to help!
+Feel free to start an issue if you have any questions or post your questions/thoughts in [our Discussions channel](https://github.com/zehuilu/Learning-from-Directional-Corrections/discussions). We're happy to help!
 
 
 ## How to Play the Human-Robot Games?
