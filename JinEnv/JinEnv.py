@@ -461,9 +461,7 @@ class RobotArm:
 
         return position
 
-    def human_interface(self,l1, l2, state_traj, obstacles=False):
-
-
+    def human_interface(self, l1, l2, state_traj, obstacles=False):
         # set figure
         plt.close()
         fig=plt.figure()
@@ -492,8 +490,6 @@ class RobotArm:
                 ax.text(2.6, 4, 'FAIL!', fontsize=12,  c='#A2142F', weight='bold')
             else:
                 ax.text(2.4, 4, 'SUCCESS!', fontsize=12, c='#77AC30', weight='bold')
-
-
 
         # set lines
         line, = ax.plot([], [], 'o-', lw=3)
@@ -1198,8 +1194,6 @@ class Quadrotor:
             # check if the uav trajectory can make it through the gate
             logical_result = np.logical_and((position[:,0]>front_x), (position[:,0]<front_x+thickness))
             time_index_gate = np.where(logical_result)[0]
-            # print("time_index_gate")
-            # print(time_index_gate)
             pass_flag = []
 
             # when no positions satisfy the condition for x, fail
@@ -1207,13 +1201,6 @@ class Quadrotor:
                 for t in time_index_gate:
                     position_t_y = position[t,1]
                     position_t_z = position[t,2]
-
-                    # print("checkpoint")
-                    # print((position_t_y>front_y+thickness))
-                    # print((position_t_y<front_y+width-thickness))
-                    # print((position_t_z>front_z+thickness))
-                    # print((position_t_z<front_z+height-thickness))
-
                     pass_flag.append( (position_t_y>front_y+thickness) and (position_t_y<front_y+width-thickness) and 
                                 (position_t_z>front_z+thickness) and (position_t_z<front_z+height-thickness) )
 
