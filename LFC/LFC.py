@@ -57,7 +57,7 @@ class MVE:
             else:
                 x = theta
                 y = (b-n[0]*x)/n[1]
-            lines+=[(x,y)]
+            lines.append( (x,y) )
 
         for line in lines:
             plt.plot(line[0],line[1])
@@ -134,7 +134,7 @@ class OCSys:
 
         # "Lift" initial conditions
         Xk = MX.sym('X0', self.n_state)
-        w += [Xk]
+        w.append(Xk)
         lbw += ini_state
         ubw += ini_state
         w0 += ini_state
@@ -143,7 +143,7 @@ class OCSys:
         for k in range(horizon):
             # New NLP variable for the control
             Uk = MX.sym('U_' + str(k), self.n_control)
-            w += [Uk]
+            w.append(Uk)
             lbw += self.control_lb
             ubw += self.control_ub
             w0 += [0.5 * (x + y) for x, y in zip(self.control_lb, self.control_ub)]
@@ -155,18 +155,18 @@ class OCSys:
 
             # New NLP variable for state at end of interval
             Xk = MX.sym('X_' + str(k + 1), self.n_state)
-            w += [Xk]
+            w.append(Xk)
             lbw += self.state_lb
             ubw += self.state_ub
             w0 += [0.5 * (x + y) for x, y in zip(self.state_lb, self.state_ub)]
 
             # Add equality constraint
-            g += [Xnext - Xk]
+            g.append(Xnext - Xk)
             lbg += self.n_state * [0]
             ubg += self.n_state * [0]
 
         # add the final cost
-        J = J+self.final_cost_fn(Xk)
+        J = J + self.final_cost_fn(Xk)
 
         # Create an NLP solver and solve it
         opts = {'ipopt.print_level': print_level, 'ipopt.sb': 'yes', 'print_time': print_level}

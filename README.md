@@ -197,6 +197,12 @@ $ cd <ROOT_DIRECTORY>
 $ python3 examples/run_quad_game.py
 ```
 
+Sometimes I meet the following error when running it on macOS. 
+```
+zsh: illegal hardware instruction
+```
+I guess it is caused by the privacy settings of input monitoring. I tried to authorize Python3 for input monitoring but it didn't work. You can either live with it :( or run it in an IDE.
+
 
 The goal of this game is to let a human player to  teach a 6-DoF quadrotor 
 system to learn a valid control cost function 

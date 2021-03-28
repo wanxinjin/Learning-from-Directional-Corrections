@@ -7,7 +7,7 @@ sys.path.append(os.getcwd()+'/lib')
 import numpy as np
 from casadi import *
 import scipy.io as sio
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pltdad
 import time
 import transforms3d
 from dataclasses import dataclass, field
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # define the initial condition
     R = np.array([[1,0,0],[0,1,0],[0,0,1]]) # rotation matrix in numpy 2D array
     QuadInitialCondition = QuadStates()
-    QuadInitialCondition.position = [-8, -8, 5]
+    QuadInitialCondition.position = [-8, -8, 2]
     QuadInitialCondition.velocity = [0, 0, 0]
     QuadInitialCondition.attitude_quaternion = transforms3d.quaternions.mat2quat(R).tolist()
     QuadInitialCondition.angular_velocity = [0, 0, 0]
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     # define the desired goal
     R = np.array([[1,0,0],[0,1,0],[0,0,1]]) # rotation matrix in numpy 2D array
     QuadDesiredStates = QuadStates()
-    QuadDesiredStates.position = [8, 8, 2]
+    QuadDesiredStates.position = [8, 2, 4]
     QuadDesiredStates.velocity = [0, 0, 0]
     QuadDesiredStates.attitude_quaternion = transforms3d.quaternions.mat2quat(R).tolist()
     QuadDesiredStates.angular_velocity = [0, 0, 0]
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # create the quadrotor algorithm solver
     Solver = QuadAlgorithm(QuadParaInput)
 
-    # solve it
+    # solve itd
     Solver.run(QuadInitialCondition, QuadDesiredStates, \
-        iter_num=20, horizon=50, save_flag=True)
+        iter_num=50, horizon=40, save_flag=False)
     
