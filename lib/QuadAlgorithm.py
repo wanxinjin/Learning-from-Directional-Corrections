@@ -88,44 +88,41 @@ class QuadAlgorithm(object):
         mve_center, mve_C = self.mve.mveSolver()
         current_guess = mve_center
 
-        # for debugging
-        try:
-            # iter_num is the maximum iteration number
-            for k in range(iter_num):
-                # generate the optimal trajectory based on current weights guess
-                opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=horizon, weights=current_guess)
-                state_traj = opt_sol['state_traj_opt']
+        # iter_num is the maximum iteration number
+        for k in range(iter_num):
+            # generate the optimal trajectory based on current weights guess
+            opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=horizon, weights=current_guess)
+            state_traj = opt_sol['state_traj_opt']
+            
+            # plot the execution and accept the human correction from GUI interface
+            human_interface = self.env.human_interface(state_traj, obstacles=True)
+
+            if not human_interface:
+                self.weights_trace.append(current_guess)
+                print("No human corrections. Repeat the previous one.")
+            else:
+                t0 = time.time()
+
+                correction, correction_time = self.env.interface_interpretation(human_interface, horizon)
+                self.corrections_trace.append(correction)
+                self.correction_time_trace.append(correction_time)
+
+                # generate the hyperplane from the correction information
+                hyperplane_a, hyperplane_b = self.oc.getHyperplane(opt_sol=opt_sol, correction=correction, correction_time=correction_time)
                 
-                # plot the execution and accept the human correction from GUI interface
-                human_interface = self.env.human_interface(state_traj, obstacles=True)
+                # add the hyperplane and generate the next weights guess
+                self.mve.addHyperplane(hyperplane_a, -hyperplane_b)
+                mve_center, mve_C, = self.mve.mveSolver()
 
-                if not human_interface:
-                    self.weights_trace.append(current_guess)
-                    print("No human corrections. Repeat the previous one.")
-                else:
-                    t0 = time.time()
+                # if the MVE solver is done
+                if mve_center is None:
+                    break
+                current_guess = mve_center
+                self.weights_trace.append(current_guess)
 
-                    correction, correction_time = self.env.interface_interpretation(human_interface, horizon)
-                    self.corrections_trace.append(correction)
-                    self.correction_time_trace.append(correction_time)
+                t1 = time.time()
 
-                    # generate the hyperplane from the correction information
-                    hyperplane_a, hyperplane_b = self.oc.getHyperplane(opt_sol=opt_sol, correction=correction, correction_time=correction_time)
-                    
-                    # add the hyperplane and generate the next weights guess
-                    self.mve.addHyperplane(hyperplane_a, -hyperplane_b)
-                    mve_center, mve_C, = self.mve.mveSolver()
-
-                    # if the MVE solver is done
-                    if mve_center is None:
-                        break
-                    current_guess = mve_center
-                    self.weights_trace.append(current_guess)
-
-                    t1 = time.time()
-
-                print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
-        except Exception as e: print(e)
+            print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
         # save the reuslts
         if save_flag:

@@ -6,6 +6,7 @@ sys.path.append(os.getcwd()+'/JinEnv')
 sys.path.append(os.getcwd()+'/lib')
 import LFC
 import JinEnv
+import time
 import numpy as np
 from casadi import *
 import scipy.io as sio
@@ -84,13 +85,17 @@ for k in range(int(K)):
 
     print('iter:', k, '--- current guess:', current_guess,)
 
-# # save the reuslts
-# results = {'weights_trace':weights_trace,
-#             'true_weights':true_weights,
-#             'correction_time_trace':correction_time_trace,
-#             'corrections_trace':corrections_trace}
-# sio.savemat('data/pendulum2_results.mat', results)
 
+# save the reuslts
+if True:
+    time_prefix = time.strftime("%Y%m%d%H%M%S")
+    results = {'weights_trace': weights_trace,
+                'true_weights': true_weights,
+                'correction_time_trace': correction_time_trace,
+                'corrections_trace': corrections_trace}
+    # save the results as mat files
+    name_prefix_mat = os.getcwd() + '/data/pendulum_results_' + time_prefix
+    sio.savemat(name_prefix_mat + '.mat', results)
 
 
 # plot the results

@@ -32,7 +32,6 @@ Please make sure that the following packages have already been installed before 
 * [Mosek](https://www.mosek.com): version >= 9.2.16, used for solving MVE (core solver). **License Required**
 * [Scipy](https://www.scipy.org/)
 * [Transforms3d](https://pypi.org/project/transforms3d/)
-* [PyQt5](https://pypi.org/project/PyQt5/)
 
 Mosek requires a license to use. You can request an academic license `mosek.lic` at https://www.mosek.com/products/academic-licenses/. Then place `mosek.lic` inside a folder `mosek` (you may need to create it manually) under the user's home directory.
 
@@ -57,11 +56,11 @@ You can install [Mosek](https://www.mosek.com) by [pip](https://pip.pypa.io/en/s
 * For Linux:
 ```
 $ sudo apt update
-$ sudo apt install build-essential coinor-libipopt-dev libxcb-xinerama0
-$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek pyqt5
+$ sudo apt install build-essential coinor-libipopt-dev
+$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek
 $ git clone https://github.com/zehuilu/Learning-from-Directional-Corrections.git
 $ cd <ROOT_DIRECTORY>
-$ mkdir trajectories data
+$ mkdir data
 $ python3 test/test_mosek_solver.py # test mosek
 $ python3 test/test_casadi_ipopt.py # test ipopt
 ```
@@ -70,8 +69,7 @@ $ python3 test/test_casadi_ipopt.py # test ipopt
 * For macOS:
 ```
 $ brew update
-$ brew install libxcb
-$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek pyqt5
+$ pip3 install casadi numpy scipy transforms3d pynput cvxpy mosek
 $ # remember to set up MOSEK license
 ```
 
@@ -108,7 +106,7 @@ Finally, run [`test/test_casadi_ipopt.py`](test/test_casadi_ipopt.py) to test if
 ```
 $ git clone https://github.com/zehuilu/Learning-from-Directional-Corrections.git
 $ cd <ROOT_DIRECTORY>
-$ mkdir trajectories data
+$ mkdir data
 $ python3 test/test_mosek_solver.py # test mosek
 $ python3 test/test_casadi_ipopt.py # test ipopt
 ```

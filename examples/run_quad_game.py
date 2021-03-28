@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # create the quadrotor algorithm solver
     Solver = QuadAlgorithm(QuadParaInput)
 
-    # solve itd
+    # solve
     Solver.run(QuadInitialCondition, QuadDesiredStates, \
         iter_num=50, horizon=40, save_flag=False)
     
