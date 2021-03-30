@@ -123,10 +123,10 @@ Feel free to start an issue if you have any questions or post your questions/tho
   <p style="margin-top:0.5cm;font-size:10px"> 
   The two-link robot arm game. 
   The goal is to let a human player  
-  teach the robot arm  to learn a valid cost function  
+  teach the robot arm to learn a valid cost function  
   by applying incremental directional corrections, 
   such that it successfully moves from the initial 
-  condition (current pose)  to  the target position 
+  condition (current pose) to the target position 
   (upward pose) while avoiding the obstacle.  
    </p>
 </td>
@@ -135,12 +135,12 @@ Feel free to start an issue if you have any questions or post your questions/tho
   <img src="doc/uav_game.png"  alt="Drawing" style="width: 400px;"/> 
 <p style="margin-top:1.5cm;font-size: 5px"> 
 
-The 6-DoF quadrotor  game. 
+The 6-DoF quadrotor game. 
  The goal of this game is to let a human player to 
   teach a 6-DoF quadrotor system to learn a valid control 
-  cost function by providing  directional corrections, 
+  cost function by providing directional corrections, 
   such that it can successfully fly from the initial 
-  position (in bottom left),  pass through a  gate (colored in brown), and finally land on the specified target  (in upper right). </p>
+  position (in bottom left), pass through a gate (colored in brown), and finally land on the specified target (in upper right). </p>
 </td>
 </tr>
 </table>
@@ -156,15 +156,15 @@ $ python3 examples/run_robotarm_game.py
 ```
 
 
-The goal of this game is to let a human player  teach the robot arm  to learn a valid cost function by 
+The goal of this game is to let a human player teach the robot arm to learn a valid cost function by 
 applying incremental directional corrections, 
 such that it successfully moves from the initial condition 
-(downward pose)  to  the target position (upward pose) 
+(downward pose) to the target position (upward pose) 
 while avoiding the obstacle.
 
-To play the  robot arm game, a human player uses a keyboard as the interface  to provide directional corrections. 
-We  customize the (`up`, `down`, `left`, `right`)
-keys in a keyboard and associate them  with  the directional corrections as instructed in the following table.
+To play the robot arm game, a human player uses a keyboard as the interface to provide directional corrections. 
+We customize the (`up`, `down`, `left`, `right`)
+keys in a keyboard and associate them with the directional corrections as instructed in the following table.
 
 |   Keys  	| Directional correction 	|               Interpretation               	|
 |:-------:	|:----------------------:	|:------------------------------------------:	|
@@ -173,14 +173,14 @@ keys in a keyboard and associate them  with  the directional corrections as inst
 |  `left` 	|        a= [0, 1]       	| add a counter-close-wise torque to Joint 2 	|
 | `right` 	|       a= [0, -1]       	|     add a close-wise torque to Joint 2     	|
 
-During the game,  the algorithm is listening to which key(s) you have  hit, and other keys except the above ones will not be recognized.
+During the game, the algorithm is listening to which key(s) you have hit, and other keys except the above ones will not be recognized.
 The game procedure is as follows:
 
-1. The robot arm  plans its motion based on its current control cost function, and then graphically executes the planned motion on the screen. 
+1. The robot arm plans its motion based on its current control cost function, and then graphically executes the planned motion on the screen. 
 2. While the robot is executing, the human player (you) can press one or multiple key(s) (see the above table instruction) to correct the robot.
 3. Once the algorithm detects that you have pressed one or multiple keys, the command line will prompt you 
 which key(s) you have hit and also the keystroke time (i.e., the correction time) ---- 
-at which time step in the robot's motion horizon the key is pressed. Then, the  interface will translate your key pressing 
+at which time step in the robot's motion horizon the key is pressed. Then, the interface will translate your key pressing 
 information into the directional correction based on the above table.
 4. The robot arm will use such the directional correction 
 to update its  control cost function. Go to Step 1.
@@ -202,31 +202,31 @@ zsh: illegal hardware instruction
 I guess it is caused by the privacy settings of input monitoring. I tried to authorize Python3 for input monitoring but it didn't work. You can either live with it :( or run it in an IDE.
 
 
-The goal of this game is to let a human player to  teach a 6-DoF quadrotor 
+The goal of this game is to let a human player to teach a 6-DoF quadrotor 
 system to learn a valid control cost function 
-by providing  directional corrections, 
+by providing directional corrections, 
 such that it can successfully fly from the initial position (in bottom left), 
- pass through a  gate (colored in brown), 
- and finally land on the specified target  (in upper right).
+pass through a gate (colored in brown), 
+and finally land on the specified target (in upper right).
 
-In the 6-DoF quadrotor game, a human player uses a keyboard  as the interface  
- to provide directional corrections. Specifically, the player can use the (`up`, `down`, `w`, `s`, `a`, `d`) keys, which are
-associated  with specific directional correction signals,  as listed in the following table.
+In the 6-DoF quadrotor game, a human player uses a keyboard as the interface  
+to provide directional corrections. Specifically, the player can use the (`up`, `down`, `left`, `right`, `a`, `d`) keys, which are
+associated with specific directional correction signals, as listed in the following table.
 
-|  Keys  	|    Direction correction    	|                   Interpretation                   	|
-|:------:	|:--------------------------:	|:--------------------------------------------------:	|
-|  `up`  	|   T1=1, T2=1, T3=1, T4=1   	|    Upward force applied at COM of the quadrotor    	|
-| `down` 	| T1=-1, T2=-1, T3=-1, T4=-1 	|   Downward force applied at COM of the quadrotor   	|
-|   `w`  	|   T1=0, T2=1, T3=0, T4=-1  	| Negative torque along x body-axis of the quadrotor 	|
-|   `s`  	|   T1=0, T2=-1, T3=0, T4=1  	| Positive torque along x body-axis of the quadrotor 	|
-|   `a`  	|  T1=1, T2=0, T3=-1, T4=-0  	| Negative torque along y body-axis of the quadrotor 	|
-|   `d`  	|  T1=-1, T2=0, T3=1, T4=-0  	| Positive torque along y body-axis of the quadrotor 	|
+|  Keys   |    Direction correction    	|                   Interpretation                   	|
+|:------: |:--------------------------:	|:--------------------------------------------------:	|
+|  `up`   |   T1=1, T2=1, T3=1, T4=1   	|    Upward force applied at COM of the quadrotor    	|
+| `down`  | T1=-1, T2=-1, T3=-1, T4=-1 	|   Downward force applied at COM of the quadrotor   	|
+| `left`  |  T1=1, T2=0, T3=-1, T4=-0  	| Negative torque along y body-axis of the quadrotor 	|
+| `right` |  T1=-1, T2=0, T3=1, T4=-0  	| Positive torque along y body-axis of the quadrotor 	|
+|   `a`   |   T1=0, T2=1, T3=0, T4=-1  	| Negative torque along x body-axis of the quadrotor 	|
+|   `d`   |   T1=0, T2=-1, T3=0, T4=1  	| Positive torque along x body-axis of the quadrotor 	|
 
-During the game,  the algorithm is listening to which key(s) you have  hit, and other keys except the above ones will not be recognized.
+During the game, the algorithm is listening to which key(s) you have hit, and other keys except the above ones will not be recognized.
 The 6-DoF quadrotor game procedure is as follows:
 
 1. The quadrotor plans its motion based on its current control cost function, then graphically executing its planned motion on the screen.
-2.  While the quadrotor is executing (flying), the human player (you) can press one or multiple key(s) (see the above table instruction) to correct the quadrotor.
+2. While the quadrotor is executing (flying), the human player (you) can press one or multiple key(s) (see the above table instruction) to correct the quadrotor.
 3. Once the algorithm detects that you have pressed one or multiple keys, the command line will prompt you 
 which key(s) you have hit and also the keystroke time (i.e., the correction time) ---- 
 at which time step in the robot's motion horizon the key is pressed. Then, the  interface will translate your key pressing 

@@ -1174,7 +1174,7 @@ class Quadrotor:
             front_z = 1.5
             thickness = 1.0
             height = 6
-            width = 6
+            width = 5.5
             # plot the obstacle on main view
             bar1_front = ax.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[thickness], dz=[height], color='#D95319',  alpha=0.3)
             bar1_bottom = ax.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
@@ -1216,7 +1216,7 @@ class Quadrotor:
 
         # allowed key press
         directions = [keyboard.Key.up, keyboard.Key.down,
-                      keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s'),
+                      keyboard.Key.left, keyboard.Key.right,
                       keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')]
 
         with keyboard.Events() as events:
@@ -1277,19 +1277,19 @@ class Quadrotor:
                     human_interactions.append(inputs)
 
                     if inputs[-2] == keyboard.Key.up:
-                        purpose_str = " Human wants to move upwards"
+                        purpose_str = " Human wants to move towards +Z axis"
                     elif inputs[-2] == keyboard.Key.down:
-                        purpose_str = " Human wants to move downwards"
-                    elif inputs[-2] == keyboard.KeyCode(char='w'):
-                        purpose_str = " Human wants to move faster"
-                    elif inputs[-2] == keyboard.KeyCode(char='s'):
-                        purpose_str = " Human wants to move slower"
+                        purpose_str = " Human wants to move towards -Z axis"
+                    elif inputs[-2] == keyboard.Key.left:
+                        purpose_str = " Human wants to move towards +Y axis"
+                    elif inputs[-2] == keyboard.Key.right:
+                        purpose_str = " Human wants to move towards -Y axis"
                     elif inputs[-2] == keyboard.KeyCode(char='a'):
-                        purpose_str = " Human wants to move leftwards"
+                        purpose_str = " Human wants to move towards +X axis"
                     else:
-                        purpose_str = " Human wants to move rightwards"
+                        purpose_str = " Human wants to move towards -X axis"
 
-                    print('Human action captured:', inputs, purpose_str)
+                    print('Human action captured:', inputs[-2], purpose_str)
 
                 plt.pause(0.01)
 
@@ -1412,18 +1412,18 @@ class Quadrotor:
                         current_correction[1] = -1
                         current_correction[2] = -1
                         current_correction[3] = -1
-                    elif interaction[i] == keyboard.KeyCode(char='w'):
-                        current_correction[1] = 1
-                        current_correction[3] = -1
-                    elif interaction[i] == keyboard.KeyCode(char='s'):
-                        current_correction[1] = -1
-                        current_correction[3] = 1
-                    elif interaction[i] == keyboard.KeyCode(char='a'):
+                    elif interaction[i] == keyboard.Key.left:
                         current_correction[0] = 1
                         current_correction[2] = -1
-                    else:
+                    elif interaction[i] == keyboard.Key.right:
                         current_correction[0] = -1
                         current_correction[2] = 1
+                    elif interaction[i] == keyboard.KeyCode(char='a'):
+                        current_correction[1] = 1
+                        current_correction[3] = -1
+                    else:
+                        current_correction[1] = -1
+                        current_correction[3] = 1
 
                 correction.append(current_correction)
 

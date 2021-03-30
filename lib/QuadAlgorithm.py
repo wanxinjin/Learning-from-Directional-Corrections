@@ -97,12 +97,11 @@ class QuadAlgorithm(object):
             # plot the execution and accept the human correction from GUI interface
             human_interface = self.env.human_interface(state_traj, obstacles=True)
 
+            t0 = time.time()
             if not human_interface:
                 self.weights_trace.append(current_guess)
                 print("No human corrections. Repeat the previous one.")
             else:
-                t0 = time.time()
-
                 correction, correction_time = self.env.interface_interpretation(human_interface, horizon)
                 self.corrections_trace.append(correction)
                 self.correction_time_trace.append(correction_time)
@@ -120,8 +119,7 @@ class QuadAlgorithm(object):
                 current_guess = mve_center
                 self.weights_trace.append(current_guess)
 
-                t1 = time.time()
-
+            t1 = time.time()
             print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
         # save the reuslts
