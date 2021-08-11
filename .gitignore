@@ -1,0 +1,7 @@
+*.DS_Store
+/.vscode/*
+/.idea/*
+JinEnv/__pycache__/*
+LFC/__pycache__/*
+lib/__pycache__/*
+data/*

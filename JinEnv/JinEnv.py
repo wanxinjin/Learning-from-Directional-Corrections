@@ -1,22 +1,7 @@
-'''
-# This module is a simulation environment, which provides different-level (from easy to hard)
-# simulation benchmark environments and animation facilities for the user to test their learning algorithm.
-# This environment is versatile to use, e.g. the user can arbitrarily:
-# set the parameters for the dynamics and objective function,
-# obtain the analytical dynamics models, as well as the differentiations.
-# define and modify the control cost function
-# animate the motion of the system.
-
-# Do NOT distribute without written permission from Wanxin Jin
-# Do NOT use it for any commercial purpose
-
-# Contact email: wanxinjin@gmail.com
-# Last update: May. 15, 2020
-
-#
-
-'''
-
+#!/usr/bin/env python3
+import os
+import sys
+sys.path.append(os.getcwd()+'/lib')
 from casadi import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,7 +14,26 @@ from matplotlib.patches import Circle, PathPatch
 import math
 import time
 from pynput import keyboard
+from dataclasses import dataclass, field
+from QuadStates import QuadStates
 
+
+'''
+This module is a simulation environment, which provides different-level (from easy to hard)
+simulation benchmark environments and animation facilities for the user to test their learning algorithm.
+This environment is versatile to use, e.g. the user can arbitrarily:
+set the parameters for the dynamics and objective function,
+obtain the analytical dynamics models, as well as the differentiations.
+define and modify the control cost function
+animate the motion of the system.
+
+Do NOT distribute without written permission from Wanxin Jin
+Do NOT use it for any commercial purpose
+
+Contact email: wanxinjin@gmail.com
+Last update: May. 15, 2020
+
+'''
 
 
 # plane ball
@@ -88,7 +92,7 @@ class PlaneBall:
         # initialization
         scat = ax.scatter(state_traj[0, 0], state_traj[0, 1], c='red', s=20)
         line, = ax.plot([], [], '-', lw=1, c='gray')
-        directions=[keyboard.Key.up, keyboard.Key.down, keyboard.Key.right, keyboard.Key.left ]
+        directions = [keyboard.Key.up, keyboard.Key.down, keyboard.Key.right, keyboard.Key.left]
 
         # The event listener will be running in this block
         with keyboard.Events() as events:
@@ -102,14 +106,14 @@ class PlaneBall:
                 event = events.get(0.005)
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
-                        inputs += [event.key]
+                        inputs.append(event.key)
                 event = events.get(0.005)
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
-                        inputs += [event.key]
-                if len(inputs) is not 0:
-                    inputs += [i]
-                    human_interactions += [inputs]
+                        inputs.append(event.key)
+                if len(inputs) != 0:
+                    inputs.append(i)
+                    human_interactions.append(inputs)
                     print('Human action captured:', inputs)
                 plt.pause(0.05)
             return human_interactions
@@ -119,7 +123,7 @@ class PlaneBall:
         correction=[]
         for interaction in human_interactions:
             if interaction[-1] < horizon:
-                correction_time += [interaction[-1]]
+                correction_time.append(interaction[-1])
                 current_correction = np.zeros(2)
                 for i in range(len(interaction) - 1):
                     if interaction[i] == keyboard.Key.left:
@@ -130,7 +134,7 @@ class PlaneBall:
                         current_correction[1] = 1
                     else:
                         current_correction[1] = -1
-                correction += [current_correction]
+                correction.append(current_correction)
 
         return correction, correction_time
 
@@ -148,19 +152,19 @@ class SinglePendulum:
         parameter = []
         if l is None:
             self.l = SX.sym('l')
-            parameter += [self.l]
+            parameter.append(self.l)
         else:
             self.l = l
 
         if m is None:
             self.m = SX.sym('m')
-            parameter += [self.m]
+            parameter.append(self.m)
         else:
             self.m = m
 
         if damping_ratio is None:
             self.damping_ratio = SX.sym('damping_ratio')
-            parameter += [self.damping_ratio]
+            parameter.append(self.damping_ratio)
         else:
             self.damping_ratio = damping_ratio
 
@@ -180,13 +184,13 @@ class SinglePendulum:
         parameter = []
         if wq is None:
             self.wq = SX.sym('wq')
-            parameter += [self.wq]
+            parameter.append(self.wq)
         else:
             self.wq = wq
 
         if wdq is None:
             self.wdq = SX.sym('wdq')
-            parameter += [self.wdq]
+            parameter.append(self.wdq)
         else:
             self.wdq = wdq
 
@@ -285,25 +289,25 @@ class RobotArm:
         parameter = []
         if l1 is None:
             self.l1 = SX.sym('l1')
-            parameter += [self.l1]
+            parameter.append(self.l1)
         else:
             self.l1 = l1
 
         if m1 is None:
             self.m1 = SX.sym('m1')
-            parameter += [self.m1]
+            parameter.append(self.m1)
         else:
             self.m1 = m1
 
         if l2 is None:
             self.l2 = SX.sym('l2')
-            parameter += [self.l2]
+            parameter.append(self.l2)
         else:
             self.l2 = l2
 
         if m2 is None:
             self.m2 = SX.sym('m2')
-            parameter += [self.m2]
+            parameter.append(self.m2)
         else:
             self.m2 = m2
 
@@ -340,25 +344,25 @@ class RobotArm:
         parameter = []
         if wq1 is None:
             self.wq1 = SX.sym('wq1')
-            parameter += [self.wq1]
+            parameter.append(self.wq1)
         else:
             self.wq1 = wq1
 
         if wq2 is None:
             self.wq2 = SX.sym('wq2')
-            parameter += [self.wq2]
+            parameter.append(self.wq2)
         else:
             self.wq2 = wq2
 
         if wdq1 is None:
             self.wdq1 = SX.sym('wdq1')
-            parameter += [self.wdq1]
+            parameter.append(self.wdq1)
         else:
             self.wdq1 = wdq1
 
         if wdq2 is None:
             self.wdq2 = SX.sym('wdq2')
-            parameter += [self.wdq2]
+            parameter.append(self.wdq2)
         else:
             self.wdq2 = wdq2
 
@@ -457,9 +461,7 @@ class RobotArm:
 
         return position
 
-    def human_interface(self,l1, l2, state_traj, obstacles=False):
-
-
+    def human_interface(self, l1, l2, state_traj, obstacles=False):
         # set figure
         plt.close()
         fig=plt.figure()
@@ -489,8 +491,6 @@ class RobotArm:
             else:
                 ax.text(2.4, 4, 'SUCCESS!', fontsize=12, c='#77AC30', weight='bold')
 
-
-
         # set lines
         line, = ax.plot([], [], 'o-', lw=3)
 
@@ -510,14 +510,14 @@ class RobotArm:
                 event = events.get(0.005)
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
-                        inputs += [event.key]
+                        inputs.append(event.key)
                 event = events.get(0.005)
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
-                        inputs += [event.key]
-                if len(inputs) is not 0:
-                    inputs += [i]
-                    human_interactions += [inputs]
+                        inputs.append(event.key)
+                if len(inputs) != 0:
+                    inputs.append(i)
+                    human_interactions.append(inputs)
                     print('Human action captured:', inputs)
 
                 plt.pause(0.01)
@@ -525,22 +525,22 @@ class RobotArm:
             return human_interactions
 
     def interface_interpretation(self, human_interactions, horizon):
-        correction_time=[]
-        correction=[]
+        correction_time = []
+        correction = []
         for interaction in human_interactions:
-            if interaction[-1]<horizon:
-                correction_time+=[interaction[-1]]
-                current_correction=np.zeros(2)
+            if interaction[-1] < horizon:
+                correction_time.append(interaction[-1])
+                current_correction = np.zeros(2)
                 for i in range(len(interaction) - 1):
-                    if interaction[i]==keyboard.Key.up:
-                        current_correction[0]=1
-                    elif interaction[i]==keyboard.Key.down:
+                    if interaction[i] == keyboard.Key.up:
+                        current_correction[0] = 1
+                    elif interaction[i] == keyboard.Key.down:
                         current_correction[0] = -1
-                    elif interaction[i]==keyboard.Key.left:
-                        current_correction[1]=1
+                    elif interaction[i] == keyboard.Key.left:
+                        current_correction[1] = 1
                     else:
-                        current_correction[1]=-1
-                correction+=[current_correction]
+                        current_correction[1] = -1
+                correction.append(current_correction)
 
         return correction, correction_time
 
@@ -558,18 +558,18 @@ class CartPole:
         parameter = []
         if mc is None:
             self.mc = SX.sym('mc')
-            parameter += [self.mc]
+            parameter.append(self.mc)
         else:
             self.mc = mc
 
         if mp is None:
             self.mp = SX.sym('mp')
-            parameter += [self.mp]
+            parameter.append(self.mp)
         else:
             self.mp = mp
         if l is None:
             self.l = SX.sym('l')
-            parameter += [self.l]
+            parameter.append(self.l)
         else:
             self.l = l
         self.dyn_auxvar = vcat(parameter)
@@ -591,24 +591,24 @@ class CartPole:
         parameter = []
         if wx is None:
             self.wx = SX.sym('wx')
-            parameter += [self.wx]
+            parameter.append(self.wx)
         else:
             self.wx = wx
 
         if wq is None:
             self.wq = SX.sym('wq')
-            parameter += [self.wq]
+            parameter.append(self.wq)
         else:
             self.wq = wq
         if wdx is None:
             self.wdx = SX.sym('wdx')
-            parameter += [self.wdx]
+            parameter.append(self.wdx)
         else:
             self.wdx = wdx
 
         if wdq is None:
             self.wdq = SX.sym('wdq')
-            parameter += [self.wdq]
+            parameter.append(self.wdq)
         else:
             self.wdq = wdq
         self.cost_auxvar = vcat(parameter)
@@ -727,45 +727,46 @@ class Quadrotor:
         f1, f2, f3, f4 = SX.sym('f1'), SX.sym('f2'), SX.sym('f3'), SX.sym('f4')
         self.T_B = vertcat(f1, f2, f3, f4)
 
+
     def initDyn(self, Jx=None, Jy=None, Jz=None, mass=None, l=None, c=None):
         # global parameter
-        g = 10
+        g = 9.81
 
         # parameters settings
         parameter = []
         if Jx is None:
             self.Jx = SX.sym('Jx')
-            parameter += [self.Jx]
+            parameter.append(self.Jx)
         else:
             self.Jx = Jx
 
         if Jy is None:
             self.Jy = SX.sym('Jy')
-            parameter += [self.Jy]
+            parameter.append(self.Jy)
         else:
             self.Jy = Jy
 
         if Jz is None:
             self.Jz = SX.sym('Jz')
-            parameter += [self.Jz]
+            parameter.append(self.Jz)
         else:
             self.Jz = Jz
 
         if mass is None:
             self.mass = SX.sym('mass')
-            parameter += [self.mass]
+            parameter.append(self.mass)
         else:
             self.mass = mass
 
         if l is None:
             self.l = SX.sym('l')
-            parameter += [self.l]
+            parameter.append(self.l)
         else:
             self.l = l
 
         if c is None:
             self.c = SX.sym('c')
-            parameter += [self.c]
+            parameter.append(self.c)
         else:
             self.c = c
 
@@ -802,51 +803,54 @@ class Quadrotor:
         self.U = self.T_B
         self.f = vertcat(dr_I, dv_I, dq, dw)
 
-    def initCost(self, wr=None, wv=None, wq=None, ww=None, wthrust=0.1):
+
+    def initCost(self, QuadDesiredStates: QuadStates, wr=None, wv=None, wq=None, ww=None, wthrust=0.1):
+
+        # load the goal states
+        goal_r_I = np.array(QuadDesiredStates.position)
+        goal_v_I = np.array(QuadDesiredStates.velocity)
+        goal_q = QuadDesiredStates.attitude_quaternion
+        goal_w_B = QuadDesiredStates.angular_velocity
 
         parameter = []
         if wr is None:
             self.wr = SX.sym('wr')
-            parameter += [self.wr]
+            parameter.append(self.wr)
         else:
             self.wr = wr
 
         if wv is None:
             self.wv = SX.sym('wv')
-            parameter += [self.wv]
+            parameter.append(self.wv)
         else:
             self.wv = wv
 
         if wq is None:
             self.wq = SX.sym('wq')
-            parameter += [self.wq]
+            parameter.append(self.wq)
         else:
             self.wq = wq
 
         if ww is None:
             self.ww = SX.sym('ww')
-            parameter += [self.ww]
+            parameter.append(self.ww)
         else:
             self.ww = ww
 
         self.cost_auxvar = vcat(parameter)
 
         # goal position in the world frame
-        goal_r_I = np.array([0, 0, 0])
         self.cost_r_I = dot(self.r_I - goal_r_I, self.r_I - goal_r_I)
 
         # goal velocity
-        goal_v_I = np.array([0, 0, 0])
         self.cost_v_I = dot(self.v_I - goal_v_I, self.v_I - goal_v_I)
 
         # final attitude error
-        goal_q = toQuaternion(0, [0, 0, 1])
         goal_R_B_I = self.dir_cosine(goal_q)
         R_B_I = self.dir_cosine(self.q)
         self.cost_q = trace(np.identity(3) - mtimes(transpose(goal_R_B_I), R_B_I))
 
         # auglar velocity cost
-        goal_w_B = np.array([0, 0, 0])
         self.cost_w_B = dot(self.w_B - goal_w_B, self.w_B - goal_w_B)
 
         # the thrust cost
@@ -861,6 +865,7 @@ class Quadrotor:
                           self.wv * self.cost_v_I + \
                           self.ww * self.cost_w_B + \
                           self.wq * self.cost_q
+
 
     def get_quadrotor_position(self, wing_len, state_traj):
 
@@ -878,7 +883,10 @@ class Quadrotor:
             rc = state_traj[t, 0:3]
             # altitude of quaternion
             q = state_traj[t, 6:10]
-            q = q/ numpy.linalg.norm(q)
+
+            # q here is a 1D list, no matter which type state_traj is (numpy 2d array or 2d list)
+            if abs(np.linalg.norm(q)) > 1e-6:
+                q = np.array(q) / np.linalg.norm(q)
 
             # direction cosine matrix from body to inertial
             CIB = np.transpose(self.dir_cosine(q).full())
@@ -897,6 +905,7 @@ class Quadrotor:
             position[t, 12:15] = r4_pos
 
         return position
+
 
     def play_animation(self, wing_len, state_traj, state_traj_ref=None, dt=0.1, save_option=0, title='UAV Maneuvering'):
         fig = plt.figure()
@@ -1021,6 +1030,7 @@ class Quadrotor:
 
         plt.show()
 
+
     def dir_cosine(self, q):
         C_B_I = vertcat(
             horzcat(1 - 2 * (q[2] ** 2 + q[3] ** 2), 2 * (q[1] * q[2] + q[0] * q[3]), 2 * (q[1] * q[3] - q[0] * q[2])),
@@ -1029,6 +1039,7 @@ class Quadrotor:
         )
         return C_B_I
 
+
     def skew(self, v):
         v_cross = vertcat(
             horzcat(0, -v[2], v[1]),
@@ -1036,6 +1047,7 @@ class Quadrotor:
             horzcat(-v[1], v[0], 0)
         )
         return v_cross
+
 
     def omega(self, w):
         omeg = vertcat(
@@ -1046,6 +1058,7 @@ class Quadrotor:
         )
         return omeg
 
+
     def quaternion_mul(self, p, q):
         return vertcat(p[0] * q[0] - p[1] * q[1] - p[2] * q[2] - p[3] * q[3],
                        p[0] * q[1] + p[1] * q[0] + p[2] * q[3] - p[3] * q[2],
@@ -1053,19 +1066,24 @@ class Quadrotor:
                        p[0] * q[3] + p[1] * q[2] - p[2] * q[1] + p[3] * q[0]
                        )
 
-    def initFinalCost(self,goal_r_I):
+
+    def initFinalCost(self, QuadDesiredStates: QuadStates):
+
+        # load the goal states
+        goal_r_I = np.array(QuadDesiredStates.position)
+        goal_v_I = np.array(QuadDesiredStates.velocity)
+        goal_q = QuadDesiredStates.attitude_quaternion
+        goal_w_B = QuadDesiredStates.angular_velocity
+
         # goal aspect
         self.cost_goal_r = dot(self.r_I - goal_r_I, self.r_I - goal_r_I)
         # velocity aspect
-        goal_v_I = np.array([0, 0, 0])
         self.cost_goal_v = dot(self.v_I - goal_v_I, self.v_I - goal_v_I)
         # orientation aspect
-        goal_q = toQuaternion(0, [0, 0, 1])
         goal_R_B_I = self.dir_cosine(goal_q)
         R_B_I = self.dir_cosine(self.q)
         self.cost_goal_q = trace(np.identity(3) - mtimes(transpose(goal_R_B_I), R_B_I))
         # angular aspect
-        goal_w_B = np.array([0, 0, 0])
         self.cost_goal_w = dot(self.w_B - goal_w_B, self.w_B - goal_w_B)
 
         self.final_cost = 1 * self.cost_goal_r + \
@@ -1073,7 +1091,8 @@ class Quadrotor:
                           100 * self.cost_goal_q + \
                           1 * self.cost_goal_w
 
-    def human_interface(self,state_traj,obstacles=False):
+
+    def human_interface(self, state_traj, obstacles=False):
         # fig = plt.figure()
         plt.close()
         fig = plt.figure(figsize=(8,5))
@@ -1096,7 +1115,7 @@ class Quadrotor:
         ax_top.set_ylim(-8, 8)
         ax_top.set_xlim(-8, 8)
         ax_top.zaxis.set_ticklabels([])
-        ax_top.set_title('Top view', y=1, fontsize=15)
+        ax_top.set_title('XOY Plane', y=1, fontsize=15)
         # ax_top.set_title('Top view', pad=-5, fontsize=15)
         ax_top.view_init(elev=89., azim=-90)
 
@@ -1110,13 +1129,13 @@ class Quadrotor:
         ax_front.set_xlim(-8, 8)
         ax_front.yaxis.set_ticklabels([])
         # ax_front.set_title('Front view', pad=-150, fontsize=15)
-        ax_front.set_title('Front view', y=0.85,  fontsize=15)
+        ax_front.set_title('XOZ Plane', y=0.85,  fontsize=15)
         ax_front.view_init(elev=0., azim=-90)
 
         plt.subplots_adjust(left=0, right=0.90, wspace=-0.0, hspace=0.1)
 
         # data
-        position = self.get_quadrotor_position(1.5, state_traj)
+        position = self.get_quadrotor_position(self.l, state_traj)
         sim_horizon = np.size(position, 0)
 
 
@@ -1150,57 +1169,59 @@ class Quadrotor:
 
         # place the obstacles
         if obstacles:
-            front_x=0
-            front_y=-8
-            front_z=1.5
-            thickness = 0.3
-            height=4
-            width=4
+            front_x = 0
+            front_y = -8
+            front_z = 1.5
+            thickness = 1.0
+            height = 6
+            width = 5.5
             # plot the obstacle on main view
             bar1_front = ax.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[thickness], dz=[height], color='#D95319',  alpha=0.3)
             bar1_bottom = ax.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
             bar1_top = ax.bar3d([front_x], [front_y], [front_z+height], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
             bar1_back = ax.bar3d([front_x], [front_y+width], [front_z], dx=[thickness], dy=[thickness], dz=[height+thickness], color='#D95319',  alpha=0.3)
-            # plot the obstacle on top view
+            # plot the obstacle on top view (XOY Plane)
             bar1_front = ax_top.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[thickness], dz=[height], color='#D95319',  alpha=0.3)
             bar1_bottom = ax_top.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
             bar1_top = ax_top.bar3d([front_x], [front_y], [front_z+height], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
             bar1_back = ax_top.bar3d([front_x], [front_y+width], [front_z], dx=[thickness], dy=[thickness], dz=[height+thickness], color='#D95319',  alpha=0.3)
-            # plot the obstacle on front view
+            # plot the obstacle on front view (XOZ Plane)
             bar1_front = ax_front.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[thickness], dz=[height], color='#D95319',  alpha=0.3)
             bar1_bottom = ax_front.bar3d([front_x], [front_y], [front_z], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
             bar1_top = ax_front.bar3d([front_x], [front_y], [front_z+height], dx=[thickness], dy=[width], dz=[thickness], color='#D95319',  alpha=0.3)
             bar1_back = ax_front.bar3d([front_x], [front_y+width], [front_z], dx=[thickness], dy=[thickness], dz=[height+thickness], color='#D95319',  alpha=0.3)
 
             # check if the uav trajectory can make it through the gate
-            time_index_gate=np.argwhere((position[:,0]>front_x)&(position[:,0]<front_x+thickness))[:,0]
-            pass_flag=[]
+            logical_result = np.logical_and((position[:,0]>front_x), (position[:,0]<front_x+thickness))
+            time_index_gate = np.where(logical_result)[0]
+            pass_flag = []
 
-            for t in time_index_gate:
-                position_t_y=position[t,1]
-                position_t_z=position[t,2]
-                pass_flag+=[(position_t_y>front_y+thickness)&(position_t_y<front_y+width-thickness)&
-                            (position_t_z>front_z+thickness)&(position_t_z<front_z+height-thickness)]
+            # when no positions satisfy the condition for x, fail
+            if time_index_gate.size > 0.5:
+                for t in time_index_gate:
+                    position_t_y = position[t,1]
+                    position_t_z = position[t,2]
+                    pass_flag.append( (position_t_y>front_y+thickness) and (position_t_y<front_y+width-thickness) and 
+                                (position_t_z>front_z+thickness) and (position_t_z<front_z+height-thickness) )
 
-            # check the current trajectory and ask if it is obstacle free
-            ax.text2D(0.50, 0.7, "Status:", transform=ax.transAxes, fontsize=10,weight='bold',color='#000000')
-            if all(pass_flag) is True:
-                ax.text2D(0.65, 0.7, "SUCCESS!", transform=ax.transAxes, fontsize=12, weight='bold', color='#77AC30')
+                # check the current trajectory and ask if it is obstacle free
+                ax.text2D(0.50, 0.7, "Status:", transform=ax.transAxes, fontsize=10,weight='bold',color='#000000')
+                if all(pass_flag) is True:
+                    ax.text2D(0.65, 0.7, "SUCCESS!", transform=ax.transAxes, fontsize=12, weight='bold', color='#77AC30')
+                else:
+                    ax.text2D(0.65, 0.7, "FAIL!", transform=ax.transAxes, fontsize=12, weight='bold', color='#A2142F')
             else:
                 ax.text2D(0.65, 0.7, "FAIL!", transform=ax.transAxes, fontsize=12, weight='bold', color='#A2142F')
 
 
-
-
-
         # allowed key press
         directions = [keyboard.Key.up, keyboard.Key.down,
-                      keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s'),
+                      keyboard.Key.left, keyboard.Key.right,
                       keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')]
 
         with keyboard.Events() as events:
             # plot and ainimation
-            human_interactions=[]
+            human_interactions = []
             for num in range(sim_horizon):
 
                 line_traj.set_data(position[:num, 0], position[:num, 1])
@@ -1247,23 +1268,34 @@ class Quadrotor:
                 event = events.get(0.005)
                 if event is not None:
                     if type(event) is keyboard.Events.Press and event.key in directions:
-                        inputs += [event.key]
+                        inputs.append(event.key)
                 event = events.get(0.005)
-                if event is not None:
-                    if type(event) is keyboard.Events.Press and event.key in directions:
-                        inputs += [event.key]
-                if len(inputs) is not 0:
-                    inputs += [num]
-                    human_interactions += [inputs]
-                    print('Human action captured:', inputs)
+                if event is not None: 
+                        inputs.append(event.key)
+                if len(inputs) != 0:
+                    inputs.append(num)
+                    human_interactions.append(inputs)
 
+                    if inputs[-2] == keyboard.Key.up:
+                        purpose_str = " Human wants to move towards +Z axis"
+                    elif inputs[-2] == keyboard.Key.down:
+                        purpose_str = " Human wants to move towards -Z axis"
+                    elif inputs[-2] == keyboard.Key.left:
+                        purpose_str = " Human wants to move towards +Y axis"
+                    elif inputs[-2] == keyboard.Key.right:
+                        purpose_str = " Human wants to move towards -Y axis"
+                    elif inputs[-2] == keyboard.KeyCode(char='a'):
+                        purpose_str = " Human wants to move towards +X axis"
+                    else:
+                        purpose_str = " Human wants to move towards -X axis"
+
+                    print('Human action captured:', inputs[-2], purpose_str)
 
                 plt.pause(0.01)
 
-
             return human_interactions
 
-    def human_interface2(self,state_traj):
+    def human_interface2(self, state_traj):
         fig = plt.figure(1,figsize=(11,8))
         # main view
         ax = fig.add_subplot(121, projection='3d')
@@ -1349,49 +1381,51 @@ class Quadrotor:
         #         event = events.get(0.005)
         #         if event is not None:
         #             if type(event) is keyboard.Events.Press and event.key in directions:
-        #                 inputs += [event.key]
+        #                 inputs.append(event.key)
         #         event = events.get(0.005)
         #         if event is not None:
         #             if type(event) is keyboard.Events.Press and event.key in directions:
-        #                 inputs += [event.key]
+        #                 inputs.append(event.key)
         #         if len(inputs) is not 0:
-        #             inputs += [0]
-        #             human_interactions += [inputs]
+        #             inputs.append(0)
+        #             human_interactions.append(inputs)
         #             print('Human action captured:', inputs)
         #         return []
         # plt.show()
 
-    def interface_interpretation(self,human_interactions,horizon):
-        correction_time=[]
-        correction=[]
+
+    def interface_interpretation(self, human_interactions, horizon):
+        correction_time = []
+        correction = []
         for interaction in human_interactions:
-            if interaction[-1]<horizon:
-                correction_time+=[interaction[-1]]
-                current_correction=np.zeros(4)
+            if interaction[-1] < horizon:
+                correction_time.append(interaction[-1])
+                current_correction = np.zeros(4)
                 for i in range(len(interaction) - 1):
-                    if interaction[i]==keyboard.Key.up:
-                        current_correction[0]=1
-                        current_correction[1]=1
-                        current_correction[2]=1
-                        current_correction[3]=1
-                    elif interaction[i]==keyboard.Key.down:
+                    if interaction[i] == keyboard.Key.up:
+                        current_correction[0] = 1
+                        current_correction[1] = 1
+                        current_correction[2] = 1
+                        current_correction[3] = 1
+                    elif interaction[i] == keyboard.Key.down:
                         current_correction[0] = -1
                         current_correction[1] = -1
                         current_correction[2] = -1
                         current_correction[3] = -1
-                    elif interaction[i]==keyboard.KeyCode(char='w'):
-                        current_correction[1]=1
-                        current_correction[3]=-1
-                    elif interaction[i]==keyboard.KeyCode(char='s'):
-                        current_correction[1]=-1
-                        current_correction[3]=1
-                    elif interaction[i]==keyboard.KeyCode(char='a'):
-                        current_correction[0]=1
-                        current_correction[2]=-1
+                    elif interaction[i] == keyboard.Key.left:
+                        current_correction[0] = 1
+                        current_correction[2] = -1
+                    elif interaction[i] == keyboard.Key.right:
+                        current_correction[0] = -1
+                        current_correction[2] = 1
+                    elif interaction[i] == keyboard.KeyCode(char='a'):
+                        current_correction[1] = 1
+                        current_correction[3] = -1
                     else:
-                        current_correction[0]=-1
-                        current_correction[2]=1
-                correction+=[current_correction]
+                        current_correction[1] = -1
+                        current_correction[3] = 1
+
+                correction.append(current_correction)
 
         return correction, correction_time
 
@@ -1423,31 +1457,31 @@ class Rocket:
         parameter = []
         if Jx is None:
             self.Jx = SX.sym('Jx')
-            parameter += [self.Jx]
+            parameter.append(self.Jx)
         else:
             self.Jx = Jx
 
         if Jy is None:
             self.Jy = SX.sym('Jy')
-            parameter += [self.Jy]
+            parameter.append(self.Jy)
         else:
             self.Jy = Jy
 
         if Jz is None:
             self.Jz = SX.sym('Jz')
-            parameter += [self.Jz]
+            parameter.append(self.Jz)
         else:
             self.Jz = Jz
 
         if mass is None:
             self.mass = SX.sym('mass')
-            parameter += [self.mass]
+            parameter.append(self.mass)
         else:
             self.mass = mass
 
         if l is None:
             self.l = SX.sym('l')
-            parameter += [self.l]
+            parameter.append(self.l)
         else:
             self.l = l
 
@@ -1482,31 +1516,31 @@ class Rocket:
         parameter = []
         if wr is None:
             self.wr = SX.sym('wr')
-            parameter += [self.wr]
+            parameter.append(self.wr)
         else:
             self.wr = wr
 
         if wv is None:
             self.wv = SX.sym('wv')
-            parameter += [self.wv]
+            parameter.append(self.wv)
         else:
             self.wv = wv
 
         if wtilt is None:
             self.wtilt = SX.sym('wtilt')
-            parameter += [self.wtilt]
+            parameter.append(self.wtilt)
         else:
             self.wtilt = wtilt
 
         if wsidethrust is None:
             self.wsidethrust = SX.sym('wsidethrust')
-            parameter += [self.wsidethrust]
+            parameter.append(self.wsidethrust)
         else:
             self.wsidethrust = wsidethrust
 
         if ww is None:
             self.ww = SX.sym('ww')
-            parameter += [self.ww]
+            parameter.append(self.ww)
         else:
             self.ww = ww
 
@@ -1691,7 +1725,7 @@ class Rocket:
         # horizon
         horizon = np.size(control_traj, 0)
         # for normalization in the plot
-        norm_f = np.linalg.norm(control_traj, axis=1);
+        norm_f = np.linalg.norm(control_traj, axis=1)
         max_f = np.amax(norm_f)
         position = np.zeros((horizon, 12))
         for t in range(horizon):

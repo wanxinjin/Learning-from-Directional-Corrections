@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from casadi import *
 import numpy as np
 import cvxpy as cp
@@ -11,10 +12,10 @@ class MVE:
 
     def initSearchRegion(self, x_lb, x_ub):
         self.n_x = len(x_lb)
-        self.hyperplanes_a=np.identity(self.n_x)
-        self.hyperplanes_b=np.array(x_ub).reshape((-1, 1))
-        self.hyperplanes_a=np.vstack((self.hyperplanes_a, -np.identity(self.n_x)))
-        self.hyperplanes_b=np.vstack((self.hyperplanes_b, -np.array(x_lb).reshape((-1, 1))))
+        self.hyperplanes_a = np.identity(self.n_x)
+        self.hyperplanes_b = np.array(x_ub).reshape((-1, 1))
+        self.hyperplanes_a = np.vstack((self.hyperplanes_a, -np.identity(self.n_x)))
+        self.hyperplanes_b = np.vstack((self.hyperplanes_b, -np.array(x_lb).reshape((-1, 1))))
 
     def mveSolver(self, tolerance=0.0001):
         try:
@@ -27,37 +28,36 @@ class MVE:
                 constraints += [(cp.norm2(C @ self.hyperplanes_a[i].reshape(-1, 1)) + self.hyperplanes_a[i] @ d) <=
                                 self.hyperplanes_b[i]]
 
-            prob = cp.Problem(cp.Minimize(-cp.log_det(C)),
-                              constraints)
+            prob = cp.Problem(cp.Minimize(-cp.log_det(C)), constraints)
             prob.solve(solver=cp.MOSEK, verbose=False)
             return d.value, C.value
         except:
             return None, None
 
-    def addHyperplane(self,a,b):
-        self.hyperplanes_a=np.vstack((self.hyperplanes_a, a))
-        self.hyperplanes_b=np.vstack((self.hyperplanes_b, b))
+    def addHyperplane(self, a, b):
+        self.hyperplanes_a = np.vstack((self.hyperplanes_a, a))
+        self.hyperplanes_b = np.vstack((self.hyperplanes_b, b))
 
     # this is for internal test
-    def draw(self,C=None,d=None):
-        theta=np.arange(-pi,pi+0.1,0.1)
+    def draw(self, C=None, d=None):
+        theta = np.arange(-pi,pi+0.1,0.1)
         if C is not None and d is not None:
-            circle=np.vstack((np.cos(theta),np.sin(theta)))
-            ellipsis=np.matmul(C,circle)+d.reshape(-1,1)
-            plt.plot(ellipsis[0],ellipsis[1])
+            circle = np.vstack((np.cos(theta), np.sin(theta)))
+            ellipsis = np.matmul(C,circle)+d.reshape(-1,1)
+            plt.plot(ellipsis[0], ellipsis[1])
 
         # obtain the line data
-        lines=[]
+        lines = []
         for i in range(self.hyperplanes_a.shape[0]):
-            n=self.hyperplanes_a[i]
-            b=self.hyperplanes_b[i]
-            if abs(n[1])<1e-10:
-                y=theta
-                x=np.array([b/n[0]]*theta.size)
+            n = self.hyperplanes_a[i]
+            b = self.hyperplanes_b[i]
+            if abs(n[1]) < 1e-10:
+                y = theta
+                x = np.array([b/n[0]]*theta.size)
             else:
-                x=theta
-                y=(b-n[0]*x)/n[1]
-            lines+=[(x,y)]
+                x = theta
+                y = (b-n[0]*x)/n[1]
+            lines.append( (x,y) )
 
         for line in lines:
             plt.plot(line[0],line[1])
@@ -101,17 +101,17 @@ class OCSys:
     def setDyn(self, ode):
 
         self.dyn = ode
-        self.dyn_fn = casadi.Function('dynamics', [self.state, self.control], [self.dyn])
+        self.dyn_fn = Function('dynamics', [self.state, self.control], [self.dyn])
 
     def setPathCost(self, features, weights):
         self.weights = weights
         self.features = features
         self.path_cost = dot(self.features, self.weights)
-        self.path_cost_fn = casadi.Function('cost', [self.state, self.control, self.weights], [self.path_cost])
+        self.path_cost_fn = Function('cost', [self.state, self.control, self.weights], [self.path_cost])
 
     def setFinalCost(self,final_cost):
-        self.final_cost=final_cost
-        self.final_cost_fn=casadi.Function('cost',[self.state],[self.final_cost])
+        self.final_cost = final_cost
+        self.final_cost_fn = Function('cost', [self.state], [self.final_cost])
 
     def ocSolver(self, ini_state, horizon, weights, print_level=0):
         assert hasattr(self, 'state'), "Define the state variable first!"
@@ -134,7 +134,7 @@ class OCSys:
 
         # "Lift" initial conditions
         Xk = MX.sym('X0', self.n_state)
-        w += [Xk]
+        w.append(Xk)
         lbw += ini_state
         ubw += ini_state
         w0 += ini_state
@@ -143,7 +143,7 @@ class OCSys:
         for k in range(horizon):
             # New NLP variable for the control
             Uk = MX.sym('U_' + str(k), self.n_control)
-            w += [Uk]
+            w.append(Uk)
             lbw += self.control_lb
             ubw += self.control_ub
             w0 += [0.5 * (x + y) for x, y in zip(self.control_lb, self.control_ub)]
@@ -155,18 +155,18 @@ class OCSys:
 
             # New NLP variable for state at end of interval
             Xk = MX.sym('X_' + str(k + 1), self.n_state)
-            w += [Xk]
+            w.append(Xk)
             lbw += self.state_lb
             ubw += self.state_ub
             w0 += [0.5 * (x + y) for x, y in zip(self.state_lb, self.state_ub)]
 
             # Add equality constraint
-            g += [Xnext - Xk]
+            g.append(Xnext - Xk)
             lbg += self.n_state * [0]
             ubg += self.n_state * [0]
 
         # add the final cost
-        J=J+self.final_cost_fn(Xk)
+        J = J + self.final_cost_fn(Xk)
 
         # Create an NLP solver and solve it
         opts = {'ipopt.print_level': print_level, 'ipopt.sb': 'yes', 'print_time': print_level}
@@ -208,7 +208,7 @@ class OCSys:
         dphiu_fn = Function('dphiu_fn', [self.state, self.control], [jacobian(self.features, self.control)])
 
         # compute the gradient of the final cost function
-        dhx_fn=Function('dh_fn',[self.state],[jacobian(self.final_cost,self.state)])
+        dhx_fn = Function('dh_fn',[self.state],[jacobian(self.final_cost,self.state)])
 
         # parse the input
         state_traj_opt = opt_sol['state_traj_opt']
@@ -233,11 +233,11 @@ class OCSys:
                            mtimes(dfu_fn(curr_x, curr_u).T, dfx_fn(next_x, next_u).T))
         curr_u = control_traj_opt[-1, :]
         curr_x = state_traj_opt[-2, :]
-        H1=vertcat(H1,dphiu_fn(curr_x,curr_u).T)
-        H2=vertcat(H2,dfu_fn(curr_x,curr_u).T)
-        final_x=state_traj_opt[-1,:]
-        lam=dhx_fn(final_x).T
-        H2_lam=mtimes(H2,lam)
+        H1 = vertcat(H1, dphiu_fn(curr_x,curr_u).T)
+        H2 = vertcat(H2, dfu_fn(curr_x,curr_u).T)
+        final_x = state_traj_opt[-1,:]
+        lam = dhx_fn(final_x).T
+        H2_lam = mtimes(H2, lam)
 
         return H1.full(), H2_lam.full().flatten()
 
@@ -256,14 +256,14 @@ class OCSys:
             return np.matmul(H1_t.T, correction).flatten(), np.dot(H2_lam_t.flatten(), correction.flatten())
 
         else:
-            vec_a=np.zeros(H1.shape[1])
-            b=0
+            vec_a = np.zeros(H1.shape[1])
+            b = 0
             for k, t in enumerate(correction_time):
                 H1_t = H1[t * self.n_control:(t + 1) * self.n_control, :]
                 H2_lam_t = H2_lam[t * self.n_control:(t + 1) * self.n_control]
-                correction_t=correction[k]
-                vec_a+=np.matmul(H1_t.T, correction_t.reshape((-1,1))).flatten()
-                b+=np.dot(H2_lam_t.flatten(), correction_t.flatten())
+                correction_t = correction[k]
+                vec_a += np.matmul(H1_t.T, correction_t.reshape((-1,1))).flatten()
+                b += np.dot(H2_lam_t.flatten(), correction_t.flatten())
             return vec_a, b
 
 
