@@ -210,17 +210,17 @@ pass through a gate (colored in brown),
 and finally land on the specified target (in upper right).
 
 In the 6-DoF quadrotor game, a human player uses a keyboard as the interface  
-to provide directional corrections. Specifically, the player can use the (`up`, `down`, `left`, `right`, `a`, `d`) keys, which are
+ to provide directional corrections. Specifically, the player can use the (`up`, `down`, `w`, `s`, `a`, `d`) keys, which are
 associated with specific directional correction signals, as listed in the following table.
 
-|  Keys   |    Direction correction    	|                   Interpretation                   	|
-|:------: |:--------------------------:	|:--------------------------------------------------:	|
-|  `up`   |   T1=1, T2=1, T3=1, T4=1   	|    Upward force applied at COM of the quadrotor    	|
-| `down`  | T1=-1, T2=-1, T3=-1, T4=-1 	|   Downward force applied at COM of the quadrotor   	|
-| `left`  |  T1=1, T2=0, T3=-1, T4=-0  	| Negative torque along y body-axis of the quadrotor 	|
-| `right` |  T1=-1, T2=0, T3=1, T4=-0  	| Positive torque along y body-axis of the quadrotor 	|
-|   `a`   |   T1=0, T2=1, T3=0, T4=-1  	| Negative torque along x body-axis of the quadrotor 	|
-|   `d`   |   T1=0, T2=-1, T3=0, T4=1  	| Positive torque along x body-axis of the quadrotor 	|
+|  Keys  	|    Direction correction    	|                   Interpretation                   	|
+|:------:	|:--------------------------:	|:--------------------------------------------------:	|
+|  `up`  	|   T1=1, T2=1, T3=1, T4=1   	|    Upward force applied at COM of the quadrotor    	|
+| `down` 	| T1=-1, T2=-1, T3=-1, T4=-1 	|   Downward force applied at COM of the quadrotor   	|
+|   `w`  	|   T1=0, T2=1, T3=0, T4=-1  	| Negative torque along x body-axis of the quadrotor 	|
+|   `s`  	|   T1=0, T2=-1, T3=0, T4=1  	| Positive torque along x body-axis of the quadrotor 	|
+|   `a`  	|  T1=1, T2=0, T3=-1, T4=-0  	| Negative torque along y body-axis of the quadrotor 	|
+|   `d`  	|  T1=-1, T2=0, T3=1, T4=-0  	| Positive torque along y body-axis of the quadrotor 	|
 
 During the game, the algorithm is listening to which key(s) you have hit, and other keys except the above ones will not be recognized.
 The 6-DoF quadrotor game procedure is as follows:

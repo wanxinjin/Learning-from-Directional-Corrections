@@ -22,8 +22,6 @@ weights = SX.sym('weights', features.shape)
 final_cost = 100*((env.X[0]-pi/2)**2+(env.X[1])**2+(env.X[2])**2+(env.X[3])**2)
 
 
-
-
 # load the oc solver object
 oc = LFC.OCSys()
 oc.setStateVariable(env.X)

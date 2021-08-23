@@ -908,6 +908,7 @@ class Quadrotor:
 
 
     def play_animation(self, wing_len, state_traj, state_traj_ref=None, dt=0.1, save_option=0, title='UAV Maneuvering'):
+        plt.rcParams['keymap.save'] = []
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         ax.set_xlabel('X (m)', fontsize=10, labelpad=5)
@@ -1093,6 +1094,7 @@ class Quadrotor:
 
 
     def human_interface(self, state_traj, obstacles=False):
+        plt.rcParams['keymap.save'] = []
         # fig = plt.figure()
         plt.close()
         fig = plt.figure(figsize=(8,5))
@@ -1216,7 +1218,7 @@ class Quadrotor:
 
         # allowed key press
         directions = [keyboard.Key.up, keyboard.Key.down,
-                      keyboard.Key.left, keyboard.Key.right,
+                      keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s'),
                       keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')]
 
         with keyboard.Events() as events:
@@ -1277,17 +1279,17 @@ class Quadrotor:
                     human_interactions.append(inputs)
 
                     if inputs[-2] == keyboard.Key.up:
-                        purpose_str = " Human wants to move towards +Z axis"
+                        purpose_str = " Human wants to move upwards"
                     elif inputs[-2] == keyboard.Key.down:
-                        purpose_str = " Human wants to move towards -Z axis"
-                    elif inputs[-2] == keyboard.Key.left:
-                        purpose_str = " Human wants to move towards +Y axis"
-                    elif inputs[-2] == keyboard.Key.right:
-                        purpose_str = " Human wants to move towards -Y axis"
+                        purpose_str = " Human wants to move downwards"
+                    elif inputs[-2] == keyboard.KeyCode(char='w'):
+                        purpose_str = " Human wants to move faster"
+                    elif inputs[-2] == keyboard.KeyCode(char='s'):
+                        purpose_str = " Human wants to move slower"
                     elif inputs[-2] == keyboard.KeyCode(char='a'):
-                        purpose_str = " Human wants to move towards +X axis"
+                        purpose_str = " Human wants to move leftwards"
                     else:
-                        purpose_str = " Human wants to move towards -X axis"
+                        purpose_str = " Human wants to move rightwards"
 
                     print('Human action captured:', inputs[-2], purpose_str)
 
@@ -1296,6 +1298,7 @@ class Quadrotor:
             return human_interactions
 
     def human_interface2(self, state_traj):
+        plt.rcParams['keymap.save'] = []
         fig = plt.figure(1,figsize=(11,8))
         # main view
         ax = fig.add_subplot(121, projection='3d')
@@ -1412,19 +1415,18 @@ class Quadrotor:
                         current_correction[1] = -1
                         current_correction[2] = -1
                         current_correction[3] = -1
-                    elif interaction[i] == keyboard.Key.left:
-                        current_correction[0] = 1
-                        current_correction[2] = -1
-                    elif interaction[i] == keyboard.Key.right:
-                        current_correction[0] = -1
-                        current_correction[2] = 1
-                    elif interaction[i] == keyboard.KeyCode(char='a'):
+                    elif interaction[i] == keyboard.KeyCode(char='w'):
                         current_correction[1] = 1
                         current_correction[3] = -1
-                    else:
+                    elif interaction[i] == keyboard.KeyCode(char='s'):
                         current_correction[1] = -1
                         current_correction[3] = 1
-
+                    elif interaction[i] == keyboard.KeyCode(char='a'):
+                        current_correction[0] = 1
+                        current_correction[2] = -1
+                    else:
+                        current_correction[0] = -1
+                        current_correction[2] = 1
                 correction.append(current_correction)
 
         return correction, correction_time

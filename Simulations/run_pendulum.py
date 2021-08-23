@@ -53,7 +53,6 @@ r = 4
 K = np.ceil(r*log(R/epsilon)/(-log(1-1/r)))
 
 
-
 # generate the initial weight guess
 mve_center, mve_C, = mve.mveSolver()
 current_guess = mve_center
@@ -116,7 +115,6 @@ ax.set_ylabel(r'$e_{\theta}$')
 ax.set_title('Estimation error')
 ax.grid()
 ax.set_position(pos=[0.13,0.20,0.85,0.70])
-
 
 
 plt.show()

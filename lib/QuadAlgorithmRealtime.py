@@ -2,29 +2,50 @@
 import os
 import sys
 sys.path.append(os.getcwd()+'/LFC')
-sys.path.append(os.getcwd()+'/JinEnv')
 sys.path.append(os.getcwd()+'/lib')
 import LFC
-import JinEnv
 from casadi import *
 import numpy as np
-import scipy.io as sio
 import matplotlib.pyplot as plt
+import csv
+import glob
+import json
 import math
 import time
 import transforms3d
+from pynput import keyboard
 from dataclasses import dataclass, field
 from QuadStates import QuadStates
 from QuadPara import QuadPara
+from QuadrotorRealtime import QuadrotorRealtime
 
 
-class QuadAlgorithm:
-    QuadPara: QuadPara # the dataclass QuadPara including the quadrotor parameters
-    ini_state: list # initial states for in a 1D list, [posi, velo, quaternion, angular_velo]
-    weights_trace: list # 2D list for weights trajectory during the iteration, each sub-list is a weight vector/list
+def remove_traj_ref_lib(Directory):
+    """
+    Delete all the files under a specific directory
+
+    Input:
+        Directory: A string for the directory
+
+    Output:
+        void
+
+    Usage:
+        Directory_delete = '/home/blah/RTD_Mambo_interface/traj_csv_files/*'
+        remove_traj_ref_lib(Directory_delete)
+    """
+    files = glob.glob(Directory)
+    for f in files:
+        os.remove(f)
+
+
+class QuadAlgorithmRealtime:
+    QuadPara: QuadPara  # the dataclass QuadPara including the quadrotor parameters
+    ini_state: list  # initial states for in a 1D list, [posi, velo, quaternion, angular_velo]
+    weights_trace: list  # 2D list for weights trajectory during the iteration, each sub-list is a weight vector/list
     corrections_trace: list
     correction_time_trace: list
-
+    config_data: dict  # a dictionary object for configurations of Mambo-Tracking-Interface
 
     def __init__(self, QuadParaInput: QuadPara):
         """
@@ -32,13 +53,21 @@ class QuadAlgorithm:
         """
         self.QuadPara = QuadParaInput
 
+        # load the configuration as a dictionary
+        json_file = open(os.getcwd() + "/experiments/config_aimslab.json")
+        self.config_data = json.load(json_file)
+
+        # remove all the existing files in the trajectory directory
+        directory_delete = os.path.expanduser("~") + "/Mambo-Tracking-Interface" + self.config_data["DIRECTORY_TRAJ"] + "*"
+        remove_traj_ref_lib(directory_delete)
+
     def settings(self, QuadDesiredStates: QuadStates):
         """
         Do the settings and defined the goal states.
         Rerun this function everytime the initial condition or goal states change.
         """
         # load environment
-        self.env = JinEnv.Quadrotor()
+        self.env = QuadrotorRealtime()
         self.env.initDyn(Jx=self.QuadPara.inertial_x, Jy=self.QuadPara.inertial_y, Jz=self.QuadPara.inertial_z, \
             mass=self.QuadPara.mass, l=self.QuadPara.l, c=self.QuadPara.c)
 
@@ -60,9 +89,10 @@ class QuadAlgorithm:
         self.oc.setPathCost(features=features, weights=weights)
         self.oc.setFinalCost(10 * self.env.final_cost)
 
-        # initialize sthe MVE solver
+        # initialize the MVE solver
         self.mve = LFC.MVE()
         self.mve.initSearchRegion(x_lb=[0,-8,0,-8,0,-8,0], x_ub=[1,8,1,8,1,8,0.5])
+        # self.mve.initSearchRegion(x_lb=[0,-20,0,-20,0,-20,0], x_ub=[10,20,10,20,10,20,10])
         self.weights_trace = []
         self.corrections_trace = []
         self.correction_time_trace = []
@@ -87,8 +117,19 @@ class QuadAlgorithm:
         for k in range(iter_num):
             # generate the optimal trajectory based on current weights guess
             opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=horizon, weights=current_guess)
-            state_traj = opt_sol['state_traj_opt']
             
+            # state_traj is a time_step by states numpy 2d array, each row is [positions *3, velocities *3, quaternion *4, angular velocities *3]
+            state_traj = opt_sol['state_traj_opt']
+            # time_traj is a numpy 1d array for timestamps
+            time_traj = opt_sol['time']
+
+            # save the trajectory
+            traj_csv = np.vstack((time_traj, state_traj[:, 0:6].transpose()))
+            if save_flag:
+                filename_csv = os.path.expanduser("~") + "/Mambo-Tracking-Interface" + \
+                    self.config_data["DIRECTORY_TRAJ"] + time.strftime("%Y%m%d%H%M%S") + ".csv"
+                np.savetxt(filename_csv, traj_csv, delimiter=",")
+
             # plot the execution and accept the human correction from GUI interface
             human_interface = self.env.human_interface(state_traj, obstacles=True)
 
@@ -117,13 +158,11 @@ class QuadAlgorithm:
             t1 = time.time()
             print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
-        # save the reuslts
-        if save_flag:
-            time_prefix = time.strftime("%Y%m%d%H%M%S")
-            results = {'weights_trace': self.weights_trace,
-                        'correction_time_trace': self.correction_time_trace,
-                        'corrections_trace': self.corrections_trace}
-
-            # save the results as mat files
-            name_prefix_mat = os.getcwd() + '/data/uav_results_random_' + time_prefix
-            sio.savemat(name_prefix_mat + '.mat', {'results': results})
+            print("Press Enter to next iteration")
+            while True:
+                with keyboard.Events() as events:
+                    event = events.get(3)
+                    if event is not None:
+                        if type(event) is keyboard.Events.Press:
+                            if event.key == keyboard.Key.enter:
+                                break
