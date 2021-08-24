@@ -91,8 +91,7 @@ class QuadAlgorithmRealtime:
 
         # initialize the MVE solver
         self.mve = LFC.MVE()
-        self.mve.initSearchRegion(x_lb=[0,-8,0,-8,0,-8,0], x_ub=[1,8,1,8,1,8,0.5])
-        # self.mve.initSearchRegion(x_lb=[0,-20,0,-20,0,-20,0], x_ub=[10,20,10,20,10,20,10])
+        self.mve.initSearchRegion(x_lb=[0,-8,0,-8,0,-4,0], x_ub=[1,8,1,8,1,4,2])
         self.weights_trace = []
         self.corrections_trace = []
         self.correction_time_trace = []
@@ -121,7 +120,7 @@ class QuadAlgorithmRealtime:
             # state_traj is a time_step by states numpy 2d array, each row is [positions *3, velocities *3, quaternion *4, angular velocities *3]
             state_traj = opt_sol['state_traj_opt']
             # time_traj is a numpy 1d array for timestamps
-            time_traj = opt_sol['time']
+            time_traj = opt_sol['time'] * 0.2
 
             # save the trajectory
             traj_csv = np.vstack((time_traj, state_traj[:, 0:6].transpose()))

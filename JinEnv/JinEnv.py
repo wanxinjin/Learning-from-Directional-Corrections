@@ -1087,7 +1087,7 @@ class Quadrotor:
         # angular aspect
         self.cost_goal_w = dot(self.w_B - goal_w_B, self.w_B - goal_w_B)
 
-        self.final_cost = 1 * self.cost_goal_r + \
+        self.final_cost = 50 * self.cost_goal_r + \
                           1 * self.cost_goal_v + \
                           100 * self.cost_goal_q + \
                           1 * self.cost_goal_w
@@ -1283,13 +1283,13 @@ class Quadrotor:
                     elif inputs[-2] == keyboard.Key.down:
                         purpose_str = " Human wants to move downwards"
                     elif inputs[-2] == keyboard.KeyCode(char='w'):
-                        purpose_str = " Human wants to move faster"
+                        purpose_str = " Human wants to move along +Y axis"
                     elif inputs[-2] == keyboard.KeyCode(char='s'):
-                        purpose_str = " Human wants to move slower"
+                        purpose_str = " Human wants to move -Y axis"
                     elif inputs[-2] == keyboard.KeyCode(char='a'):
-                        purpose_str = " Human wants to move leftwards"
+                        purpose_str = " Human wants to move -X axis"
                     else:
-                        purpose_str = " Human wants to move rightwards"
+                        purpose_str = " Human wants to move +X axis"
 
                     print('Human action captured:', inputs[-2], purpose_str)
 

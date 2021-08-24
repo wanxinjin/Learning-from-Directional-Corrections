@@ -18,7 +18,7 @@ from QuadPara import QuadPara
 
 if __name__ == '__main__':
     # define the quadrotor dynamics parameters
-    QuadParaInput = QuadPara(inertial_list=[1.0, 1.0, 1.0], mass=1.0, l=1.0, c=0.2)
+    QuadParaInput = QuadPara(inertial_list=[1.0, 1.0, 1.0], mass=1.0, l=1.0, c=0.02)
 
     # define the initial condition
     R = np.array([[1,0,0],[0,1,0],[0,0,1]]) # rotation matrix in numpy 2D array
@@ -40,5 +40,6 @@ if __name__ == '__main__':
     Solver = QuadAlgorithmRealtime(QuadParaInput)
 
     # solve
+    # horizon is number of steps
     Solver.run(QuadInitialCondition, QuadDesiredStates, \
         iter_num=30, horizon=40, save_flag=True)

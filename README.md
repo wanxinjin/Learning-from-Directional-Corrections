@@ -215,12 +215,12 @@ associated with specific directional correction signals, as listed in the follow
 
 |  Keys  	|    Direction correction    	|                   Interpretation                   	|
 |:------:	|:--------------------------:	|:--------------------------------------------------:	|
-|  `up`  	|   T1=1, T2=1, T3=1, T4=1   	|    Upward force applied at COM of the quadrotor    	|
-| `down` 	| T1=-1, T2=-1, T3=-1, T4=-1 	|   Downward force applied at COM of the quadrotor   	|
-|   `w`  	|   T1=0, T2=1, T3=0, T4=-1  	| Negative torque along x body-axis of the quadrotor 	|
-|   `s`  	|   T1=0, T2=-1, T3=0, T4=1  	| Positive torque along x body-axis of the quadrotor 	|
-|   `a`  	|  T1=1, T2=0, T3=-1, T4=-0  	| Negative torque along y body-axis of the quadrotor 	|
-|   `d`  	|  T1=-1, T2=0, T3=1, T4=-0  	| Positive torque along y body-axis of the quadrotor 	|
+|  `up`  	|   T1=1, T2=1, T3=1, T4=1   	| move towards +Z axis |
+| `down` 	| T1=-1, T2=-1, T3=-1, T4=-1 	| move towards -Z axis |
+|   `w`  	|   T1=0, T2=1, T3=0, T4=-1  	| move towards +Y axis |
+|   `s`  	|   T1=0, T2=-1, T3=0, T4=1  	| move towards -Y axis |
+|   `a`  	|  T1=1, T2=0, T3=-1, T4=-0  	| move towards -X axis |
+|   `d`  	|  T1=-1, T2=0, T3=1, T4=-0  	| move towards +X axis |
 
 During the game, the algorithm is listening to which key(s) you have hit, and other keys except the above ones will not be recognized.
 The 6-DoF quadrotor game procedure is as follows:
