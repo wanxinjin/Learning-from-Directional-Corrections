@@ -46,12 +46,16 @@ class QuadAlgorithmRealtime:
     corrections_trace: list
     correction_time_trace: list
     config_data: dict  # a dictionary object for configurations of Mambo-Tracking-Interface
+    time_step: float  # the length of time step for optimal controller
+    time_scale: float  # scaling the time trajectory
 
-    def __init__(self, QuadParaInput: QuadPara):
+    def __init__(self, QuadParaInput: QuadPara, time_step=0.1, time_scale=1):
         """
         constructor
         """
         self.QuadPara = QuadParaInput
+        self.time_step = time_step
+        self.time_scale = time_scale
 
         # load the configuration as a dictionary
         json_file = open(os.getcwd() + "/experiments/config_aimslab.json")
@@ -67,7 +71,7 @@ class QuadAlgorithmRealtime:
         Rerun this function everytime the initial condition or goal states change.
         """
         # load environment
-        self.env = QuadrotorRealtime()
+        self.env = QuadrotorRealtime(time_step=self.time_step, time_scale=self.time_scale)
         self.env.initDyn(Jx=self.QuadPara.inertial_x, Jy=self.QuadPara.inertial_y, Jz=self.QuadPara.inertial_z, \
             mass=self.QuadPara.mass, l=self.QuadPara.l, c=self.QuadPara.c)
 
@@ -83,8 +87,7 @@ class QuadAlgorithmRealtime:
         self.oc = LFC.OCSys()
         self.oc.setStateVariable(self.env.X)
         self.oc.setControlVariable(self.env.U)
-        dt = 0.1
-        dyn = self.env.X + dt * self.env.f
+        dyn = self.env.X + self.time_step * self.env.f
         self.oc.setDyn(dyn)
         self.oc.setPathCost(features=features, weights=weights)
         self.oc.setFinalCost(10 * self.env.final_cost)
@@ -96,9 +99,12 @@ class QuadAlgorithmRealtime:
         self.corrections_trace = []
         self.correction_time_trace = []
 
-    def run(self, QuadInitialCondition: QuadStates, QuadDesiredStates: QuadStates, iter_num: int, horizon: float, save_flag: bool):
+    def run(self, QuadInitialCondition: QuadStates, QuadDesiredStates: QuadStates, iter_num: int, time_horizon: float, save_flag: bool):
         """
         Run the algorithm.
+
+        Input:
+            time_horizon: the time horizon for optimal controller [seconds]
         """
         t0 = time.time()
         print("Algorithm is running now.")
@@ -115,12 +121,13 @@ class QuadAlgorithmRealtime:
         # iter_num is the maximum iteration number
         for k in range(iter_num):
             # generate the optimal trajectory based on current weights guess
-            opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=horizon, weights=current_guess)
+            num_steps_horizon = int(time_horizon / self.time_step)
+            opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=num_steps_horizon, weights=current_guess, time_step=self.time_step)
             
             # state_traj is a time_step by states numpy 2d array, each row is [positions *3, velocities *3, quaternion *4, angular velocities *3]
             state_traj = opt_sol['state_traj_opt']
             # time_traj is a numpy 1d array for timestamps
-            time_traj = opt_sol['time'] * 0.2
+            time_traj = opt_sol['time'] * self.time_scale
 
             # save the trajectory
             traj_csv = np.vstack((time_traj, state_traj[:, 0:6].transpose()))
@@ -137,7 +144,7 @@ class QuadAlgorithmRealtime:
                 self.weights_trace.append(current_guess)
                 print("No human corrections. Repeat the previous one.")
             else:
-                correction, correction_time = self.env.interface_interpretation(human_interface, horizon)
+                correction, correction_time = self.env.interface_interpretation(human_interface, num_steps_horizon)
                 self.corrections_trace.append(correction)
                 self.correction_time_trace.append(correction_time)
 

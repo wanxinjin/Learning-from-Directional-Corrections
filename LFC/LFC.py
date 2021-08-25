@@ -113,7 +113,7 @@ class OCSys:
         self.final_cost = final_cost
         self.final_cost_fn = Function('cost', [self.state], [self.final_cost])
 
-    def ocSolver(self, ini_state, horizon, weights, print_level=0):
+    def ocSolver(self, ini_state, horizon, weights, time_step, print_level=0):
         assert hasattr(self, 'state'), "Define the state variable first!"
         assert hasattr(self, 'control'), "Define the control variable first!"
         assert hasattr(self, 'dyn'), "Define the system dynamics first!"
@@ -181,7 +181,7 @@ class OCSys:
         sol_traj = numpy.reshape(sol_traj, (-1, self.n_state + self.n_control))
         state_traj_opt = sol_traj[:, 0:self.n_state]
         control_traj_opt = numpy.delete(sol_traj[:, self.n_state:], -1, 0)
-        time = numpy.array([k for k in range(horizon + 1)])
+        time = numpy.array([k for k in range(horizon + 1)]) * time_step
 
         # output
         opt_sol = {"state_traj_opt": state_traj_opt,

@@ -710,9 +710,8 @@ class CartPole:
 
 # quadrotor (UAV) environment
 class Quadrotor:
-    def __init__(self, project_name='my UAV'):
-        self.project_name = 'my uav'
-
+    def __init__(self, project_name='my uav'):
+        self.project_name = project_name
         # define the state of the quadrotor
         rx, ry, rz = SX.sym('rx'), SX.sym('ry'), SX.sym('rz')
         self.r_I = vertcat(rx, ry, rz)
@@ -727,11 +726,9 @@ class Quadrotor:
         f1, f2, f3, f4 = SX.sym('f1'), SX.sym('f2'), SX.sym('f3'), SX.sym('f4')
         self.T_B = vertcat(f1, f2, f3, f4)
 
-
     def initDyn(self, Jx=None, Jy=None, Jz=None, mass=None, l=None, c=None):
         # global parameter
         g = 9.81
-
         # parameters settings
         parameter = []
         if Jx is None:
@@ -803,9 +800,7 @@ class Quadrotor:
         self.U = self.T_B
         self.f = vertcat(dr_I, dv_I, dq, dw)
 
-
     def initCost(self, QuadDesiredStates: QuadStates, wr=None, wv=None, wq=None, ww=None, wthrust=0.1):
-
         # load the goal states
         goal_r_I = np.array(QuadDesiredStates.position)
         goal_v_I = np.array(QuadDesiredStates.velocity)
@@ -866,9 +861,7 @@ class Quadrotor:
                           self.ww * self.cost_w_B + \
                           self.wq * self.cost_q
 
-
     def get_quadrotor_position(self, wing_len, state_traj):
-
         # thrust_position in body frame
         r1 = vertcat(wing_len / 2, 0, 0)
         r2 = vertcat(0, -wing_len / 2, 0)
@@ -905,7 +898,6 @@ class Quadrotor:
             position[t, 12:15] = r4_pos
 
         return position
-
 
     def play_animation(self, wing_len, state_traj, state_traj_ref=None, dt=0.1, save_option=0, title='UAV Maneuvering'):
         plt.rcParams['keymap.save'] = []
@@ -1028,9 +1020,7 @@ class Quadrotor:
             writer = Writer(fps=10, metadata=dict(artist='Me'), bitrate=-1)
             ani.save('case2'+title + '.mp4', writer=writer, dpi=300)
             print('save_success')
-
         plt.show()
-
 
     def dir_cosine(self, q):
         C_B_I = vertcat(
@@ -1040,7 +1030,6 @@ class Quadrotor:
         )
         return C_B_I
 
-
     def skew(self, v):
         v_cross = vertcat(
             horzcat(0, -v[2], v[1]),
@@ -1048,7 +1037,6 @@ class Quadrotor:
             horzcat(-v[1], v[0], 0)
         )
         return v_cross
-
 
     def omega(self, w):
         omeg = vertcat(
@@ -1059,7 +1047,6 @@ class Quadrotor:
         )
         return omeg
 
-
     def quaternion_mul(self, p, q):
         return vertcat(p[0] * q[0] - p[1] * q[1] - p[2] * q[2] - p[3] * q[3],
                        p[0] * q[1] + p[1] * q[0] + p[2] * q[3] - p[3] * q[2],
@@ -1067,9 +1054,7 @@ class Quadrotor:
                        p[0] * q[3] + p[1] * q[2] - p[2] * q[1] + p[3] * q[0]
                        )
 
-
     def initFinalCost(self, QuadDesiredStates: QuadStates):
-
         # load the goal states
         goal_r_I = np.array(QuadDesiredStates.position)
         goal_v_I = np.array(QuadDesiredStates.velocity)
@@ -1088,10 +1073,9 @@ class Quadrotor:
         self.cost_goal_w = dot(self.w_B - goal_w_B, self.w_B - goal_w_B)
 
         self.final_cost = 50 * self.cost_goal_r + \
-                          1 * self.cost_goal_v + \
+                          30 * self.cost_goal_v + \
                           100 * self.cost_goal_q + \
                           1 * self.cost_goal_w
-
 
     def human_interface(self, state_traj, obstacles=False):
         plt.rcParams['keymap.save'] = []
@@ -1140,7 +1124,6 @@ class Quadrotor:
         position = self.get_quadrotor_position(self.l, state_traj)
         sim_horizon = np.size(position, 0)
 
-
         # initial for main view
         line_traj, = ax.plot(position[:1, 0], position[:1, 1], position[:1, 2])
         c_x, c_y, c_z = position[0, 0:3]
@@ -1160,14 +1143,12 @@ class Quadrotor:
         line_arm3_top, = ax_top.plot([c_x, r3_x], [c_y, r3_y], [c_z, r3_z], linewidth=2, color='red', marker='o', markersize=3)
         line_arm4_top, = ax_top.plot([c_x, r4_x], [c_y, r4_y], [c_z, r4_z], linewidth=2, color='blue', marker='o', markersize=3)
 
-
         # initial for front view
         line_traj_front, = ax_front.plot(position[:1, 0], position[:1, 1], position[:1, 2])
         line_arm1_front, = ax_front.plot([c_x, r1_x], [c_y, r1_y], [c_z, r1_z], linewidth=2, color='red', marker='o', markersize=3)
         line_arm2_front, = ax_front.plot([c_x, r2_x], [c_y, r2_y], [c_z, r2_z], linewidth=2, color='blue', marker='o', markersize=3)
         line_arm3_front, = ax_front.plot([c_x, r3_x], [c_y, r3_y], [c_z, r3_z], linewidth=2, color='red', marker='o', markersize=3)
         line_arm4_front, = ax_front.plot([c_x, r4_x], [c_y, r4_y], [c_z, r4_z], linewidth=2, color='blue', marker='o', markersize=3)
-
 
         # place the obstacles
         if obstacles:
@@ -1214,7 +1195,6 @@ class Quadrotor:
                     ax.text2D(0.65, 0.7, "FAIL!", transform=ax.transAxes, fontsize=12, weight='bold', color='#A2142F')
             else:
                 ax.text2D(0.65, 0.7, "FAIL!", transform=ax.transAxes, fontsize=12, weight='bold', color='#A2142F')
-
 
         # allowed key press
         directions = [keyboard.Key.up, keyboard.Key.down,
@@ -1264,7 +1244,6 @@ class Quadrotor:
                 line_arm4_front.set_data(np.array([[c_x, r4_x], [c_y, r4_y]]))
                 line_arm4_front.set_3d_properties(np.array([c_z, r4_z]))
 
-
                 # detect the human inputs
                 inputs = []
                 event = events.get(0.005)
@@ -1294,7 +1273,6 @@ class Quadrotor:
                     print('Human action captured:', inputs[-2], purpose_str)
 
                 plt.pause(0.01)
-
             return human_interactions
 
     def human_interface2(self, state_traj):
@@ -1352,7 +1330,6 @@ class Quadrotor:
                       keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s'),
                       keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')]
 
-
         def update_traj(num):
             line_traj.set_data(position[:num, 0], position[:num, 1])
             line_traj.set_3d_properties(position[:num, 2])
@@ -1395,7 +1372,6 @@ class Quadrotor:
         #             print('Human action captured:', inputs)
         #         return []
         # plt.show()
-
 
     def interface_interpretation(self, human_interactions, horizon):
         correction_time = []
