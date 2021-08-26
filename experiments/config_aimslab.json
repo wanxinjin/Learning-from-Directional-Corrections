@@ -27,19 +27,19 @@
         "TIME_STEP": "0.1",
 
         "FWDFEED_HEIGHT": "0.0",
-        "KP_HEIGHT": "20.0",
+        "KP_HEIGHT": "35.0",
         "KI_HEIGHT": "0.0",
-        "KD_HEIGHT": "2.0",
+        "KD_HEIGHT": "10.0",
 
         "FWDFEED_PITCH": "0.0",
-        "KP_PITCH": "30.0",
+        "KP_PITCH": "40.0",
         "KI_PITCH": "0.0",
-        "KD_PITCH": "25.0",
+        "KD_PITCH": "20.0",
 
         "FWDFEED_ROLL": "0.0",
-        "KP_ROLL": "18.0",
+        "KP_ROLL": "35.0",
         "KI_ROLL": "0.0",
-        "KD_ROLL": "2.0",
+        "KD_ROLL": "5.0",
 
         "FWDFEED_YAW": "15.0",
         "KP_YAW": "25.0",

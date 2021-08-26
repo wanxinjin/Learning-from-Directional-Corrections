@@ -48,14 +48,16 @@ class QuadAlgorithmRealtime:
     config_data: dict  # a dictionary object for configurations of Mambo-Tracking-Interface
     time_step: float  # the length of time step for optimal controller
     time_scale: float  # scaling the time trajectory
+    case_num: int  # the case number for demo
 
-    def __init__(self, QuadParaInput: QuadPara, time_step=0.1, time_scale=1):
+    def __init__(self, QuadParaInput: QuadPara, time_step=0.1, time_scale=1, case_num=1):
         """
         constructor
         """
         self.QuadPara = QuadParaInput
         self.time_step = time_step
         self.time_scale = time_scale
+        self.case_num = case_num
 
         # load the configuration as a dictionary
         json_file = open(os.getcwd() + "/experiments/config_aimslab.json")
@@ -71,7 +73,7 @@ class QuadAlgorithmRealtime:
         Rerun this function everytime the initial condition or goal states change.
         """
         # load environment
-        self.env = QuadrotorRealtime(time_step=self.time_step, time_scale=self.time_scale)
+        self.env = QuadrotorRealtime(time_step=self.time_step, time_scale=self.time_scale, case_num=self.case_num)
         self.env.initDyn(Jx=self.QuadPara.inertial_x, Jy=self.QuadPara.inertial_y, Jz=self.QuadPara.inertial_z, \
             mass=self.QuadPara.mass, l=self.QuadPara.l, c=self.QuadPara.c)
 
@@ -164,11 +166,11 @@ class QuadAlgorithmRealtime:
             t1 = time.time()
             print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
-            print("Press Enter to next iteration")
+            print("Press n to next iteration")
             while True:
                 with keyboard.Events() as events:
                     event = events.get(3)
                     if event is not None:
                         if type(event) is keyboard.Events.Press:
-                            if event.key == keyboard.Key.enter:
+                            if event.key == keyboard.KeyCode(char='n'):
                                 break

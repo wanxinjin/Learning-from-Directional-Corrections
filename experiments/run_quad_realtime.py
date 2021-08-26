@@ -16,7 +16,8 @@ from QuadStates import QuadStates
 from QuadPara import QuadPara
 
 
-TIME_SCALE = 3
+TIME_SCALE = 3.5
+CASE_NUM = 2
 
 
 if __name__ == '__main__':
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     QuadDesiredStates.angular_velocity = [0, 0, 0]
 
     # create the quadrotor algorithm solver
-    Solver = QuadAlgorithmRealtime(QuadParaInput, time_step=0.1, time_scale=TIME_SCALE)
+    Solver = QuadAlgorithmRealtime(QuadParaInput, time_step=0.1, time_scale=TIME_SCALE, case_num=CASE_NUM)
 
     # solve
     # horizon is number of steps

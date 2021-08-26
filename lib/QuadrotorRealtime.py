@@ -15,42 +15,44 @@ from dataclasses import dataclass, field
 from QuadStates import QuadStates
 
 
-# def cuboid_data2(o, size=(1, 1, 1)):
-#     """
-#     A helper function to plot 3D cube.
-#     """
-#     X = [[[0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0]],
-#          [[0, 0, 0], [0, 0, 1], [1, 0, 1], [1, 0, 0]],
-#          [[1, 0, 1], [1, 0, 0], [1, 1, 0], [1, 1, 1]],
-#          [[0, 0, 1], [0, 0, 0], [0, 1, 0], [0, 1, 1]],
-#          [[0, 1, 0], [0, 1, 1], [1, 1, 1], [1, 1, 0]],
-#          [[0, 1, 1], [0, 0, 1], [1, 0, 1], [1, 1, 1]]]
-#     X = np.array(X).astype(float)
-#     for i in range(3):
-#         X[:, :, i] *= size[i]
-#     X += np.array(o)
-#     return X
+def cuboid_data2(o, size=(1, 1, 1)):
+    """
+    A helper function to plot 3D cube.
+    """
+    X = [[[0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0]],
+         [[0, 0, 0], [0, 0, 1], [1, 0, 1], [1, 0, 0]],
+         [[1, 0, 1], [1, 0, 0], [1, 1, 0], [1, 1, 1]],
+         [[0, 0, 1], [0, 0, 0], [0, 1, 0], [0, 1, 1]],
+         [[0, 1, 0], [0, 1, 1], [1, 1, 1], [1, 1, 0]],
+         [[0, 1, 1], [0, 0, 1], [1, 0, 1], [1, 1, 1]]]
+    X = np.array(X).astype(float)
+    for i in range(3):
+        X[:, :, i] *= size[i]
+    X += np.array(o)
+    return X
 
-# def plotCubeAt2(positions, sizes=None, colors=None, **kwargs):
-#     """
-#     A helper function to plot 3D cube.
-#     """
-#     if not isinstance(colors,(list,np.ndarray)): colors=["C0"]*len(positions)
-#     if not isinstance(sizes,(list,np.ndarray)): sizes=[(1,1,1)]*len(positions)
-#     g = []
-#     for p, s, c in zip(positions, sizes, colors):
-#         g.append(cuboid_data2(p, size=s))
-#     return Poly3DCollection(np.concatenate(g),  
-#                             facecolors=np.repeat(colors,6), **kwargs)
+def plotCubeAt2(positions, sizes=None, colors=None, **kwargs):
+    """
+    A helper function to plot 3D cube.
+    """
+    if not isinstance(colors, (list, np.ndarray)): colors = ["C0"] * len(positions)
+    if not isinstance(sizes, (list, np.ndarray)): sizes = [(1,1,1)] * len(positions)
+    g = []
+    for p, s, c in zip(positions, sizes, colors):
+        g.append(cuboid_data2(p, size=s))
+    return Poly3DCollection(np.concatenate(g),  
+                            facecolors=np.repeat(colors,6), **kwargs)
 
 class QuadrotorRealtime(Quadrotor):
     time_step: float  # the length of time step for optimal controller
     time_scale: float  # scaling the time trajectory
+    case_num: int  # the case number for demo
 
-    def __init__(self, time_step=0.1, time_scale=1, project_name='my uav'):
+    def __init__(self, time_step=0.1, time_scale=1, case_num=1, project_name='my uav'):
         super().__init__(project_name)
         self.time_step = time_step
         self.time_scale = time_scale
+        self.case_num = case_num
 
     def human_interface(self, state_traj, obstacles=False):
         plt.rcParams['keymap.save'] = []
@@ -64,7 +66,7 @@ class QuadrotorRealtime(Quadrotor):
         ax.set_zlim(0, 3)
         ax.set_ylim(-1.8, 1.6)
         ax.set_xlim(-2.4, 2.4)
-        ax.set_title('Quadrotor Game')
+        ax.set_title('Quadrotor Trajeectory')
         ax.view_init(elev=25., azim=-70)
         # top view
         ax_top = fig.add_subplot(2, 2, 2)
@@ -89,15 +91,47 @@ class QuadrotorRealtime(Quadrotor):
         sim_horizon = np.size(position, 0)
 
         # obstacles
-        positions = [(-3,5,-2),(1,7,1)]
-        sizes = [(4,5,3), (3,3,7)]
-        colors = ["crimson","limegreen"]
-        # pc = plotCubeAt2(positions,sizes,colors=colors, edgecolor="k")
-
-
-
-        obs_01_top = patches.Rectangle((-0.48, -1.5), 0.96, 1.0, linewidth=1, edgecolor="red", facecolor="red")
-        obs_01_front = patches.Rectangle((-0.48, 0), 0.96, 0.8, linewidth=1, edgecolor="red", facecolor="red")
+        if self.case_num == 1:
+            obs_01_3d = plotCubeAt2(positions=[(-0.48, -1.5, 0.0)], sizes=[(0.96, 1.0, 0.8)], colors=["red"], edgecolor="k", alpha=0.5)
+            obs_01_top = patches.Rectangle((-0.48, -1.5), 0.96, 1.0, linewidth=1, edgecolor="red", facecolor="red", alpha=0.5)
+            obs_01_front = patches.Rectangle((-0.48, 0), 0.96, 0.8, linewidth=1, edgecolor="red", facecolor="red", alpha=0.5)
+            # plot obstacles
+            ax.add_collection3d(obs_01_3d)
+            ax_top.add_patch(obs_01_top)
+            ax_front.add_patch(obs_01_front)
+        elif self.case_num == 2:
+            x0 = -0.30
+            y0 = -0.80
+            z0 = 0.76
+            x1 = -0.20
+            y1 = 0.48
+            z1 = 2.00
+            dx = 0.1
+            dy = 0.1
+            dz = 0.1
+            # plot the obstacle on main view
+            window_01_3d = plotCubeAt2(positions=[(x0, y0, z0)], sizes=[(dx, y1-y0, dz)], colors=["red"], alpha=0.3)
+            window_02_3d = plotCubeAt2(positions=[(x0, y0, z0)], sizes=[(dx, dy, z1-z0)], colors=["red"], alpha=0.3)
+            window_03_3d = plotCubeAt2(positions=[(x0, y1-dy, z0)], sizes=[(dx, dy, z1-z0)], colors=["red"], alpha=0.3)
+            window_04_3d = plotCubeAt2(positions=[(x0, y0, z1-dz)], sizes=[(dx, y1-y0, dz)], colors=["red"], alpha=0.3)
+            ax.add_collection3d(window_01_3d)
+            ax.add_collection3d(window_02_3d)
+            ax.add_collection3d(window_03_3d)
+            ax.add_collection3d(window_04_3d)
+            # plot the obstacle on top view (XOY Plane)
+            window_01_top = patches.Rectangle((x0, y0), dx, y1-y0, linewidth=1, edgecolor="red", facecolor="red", alpha=0.3)
+            window_02_top = patches.Rectangle((x0, y0), dx, dy, linewidth=1, edgecolor="red", facecolor="red", alpha=0.5)
+            window_03_top = patches.Rectangle((x0, y1-dy), dx, dy, linewidth=1, edgecolor="red", facecolor="red", alpha=0.5)
+            ax_top.add_patch(window_01_top)
+            ax_top.add_patch(window_02_top)
+            ax_top.add_patch(window_03_top)
+            # plot the obstacle on front view (XOZ Plane)
+            window_01_front = patches.Rectangle((x0, z0), dx, z1-z0, linewidth=1, edgecolor="red", facecolor="red", alpha=0.3)
+            window_02_front = patches.Rectangle((x0, z0), dx, dz, linewidth=1, edgecolor="red", facecolor="red", alpha=0.5)
+            window_03_front = patches.Rectangle((x0, z1-dz), dx, dz, linewidth=1, edgecolor="red", facecolor="red", alpha=0.5)
+            ax_front.add_patch(window_01_front)
+            ax_front.add_patch(window_02_front)
+            ax_front.add_patch(window_03_front)
 
         # initial for main view
         line_traj, = ax.plot3D(position[:1, 0], position[:1, 1], position[:1, 2])
@@ -106,12 +140,10 @@ class QuadrotorRealtime(Quadrotor):
         # initial for top view
         line_traj_top, = ax_top.plot(position[:1, 0], position[:1, 1])
         line_quadrotor_top, = ax_top.plot(position[:1, 0], position[:1, 1], marker="o")
-        ax_top.add_patch(obs_01_top)
 
         # initial for front view
         line_traj_front, = ax_front.plot(position[:1, 0], position[:1, 2])
         line_quadrotor_front, = ax_front.plot(position[:1, 0], position[:1, 2], marker="o")
-        ax_front.add_patch(obs_01_front)
 
         # allowed key press
         directions = [keyboard.Key.up, keyboard.Key.down,
@@ -131,9 +163,6 @@ class QuadrotorRealtime(Quadrotor):
                 line_quadrotor.set_3d_properties(position[num, 2])
                 line_quadrotor_top.set_data(position[num, 0], position[num, 1])
                 line_quadrotor_front.set_data(position[num, 0], position[num, 2])
-
-                ax_top.add_patch(obs_01_top)
-                ax_front.add_patch(obs_01_front)
 
                 # detect the human inputs
                 inputs = []
