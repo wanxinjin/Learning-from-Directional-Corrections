@@ -47,7 +47,7 @@
         "KD_YAW": "0.0"
     },
 
-    "FLAG_TUNING_LLC": 1,
+    "FLAG_DELETE_CSV_BEGIN": 1,
     "FLAG_PLOT": 1,
     "DIRECTORY_SYSID": "/sysid_data/",
     "DIRECTORY_TRAJ": "/traj_csv_files/"
