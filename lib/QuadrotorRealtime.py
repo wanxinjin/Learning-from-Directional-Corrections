@@ -194,5 +194,6 @@ class QuadrotorRealtime(Quadrotor):
                     print('Human action captured:', inputs[-2], purpose_str)
 
                 # plt.pause(self.time_step * self.time_scale)
-                plt.pause(self.time_step * 1)
+                # plt.pause(self.time_step * 1)
+                plt.pause(0.01)
             return human_interactions

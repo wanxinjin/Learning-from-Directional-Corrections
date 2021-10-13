@@ -35,7 +35,7 @@ def remove_traj_ref_lib(directory: str):
         os.remove(f)
 
 
-class QuadAlgorithmRealtime:
+class QuadAlgorithmRealtimeCompare:
     QuadPara: QuadPara  # the dataclass QuadPara including the quadrotor parameters
     ini_state: list  # initial states for in a 1D list, [posi, velo, quaternion, angular_velo]
     weights_trace: list  # 2D list for weights trajectory during the iteration, each sub-list is a weight vector/list
@@ -94,14 +94,13 @@ class QuadAlgorithmRealtime:
         self.oc.setPathCost(features=features, weights=weights)
         self.oc.setFinalCost(10 * self.env.final_cost)
 
-        # initialize the MVE solver
-        self.mve = LFC.MVE()
-        self.mve.initSearchRegion(x_lb=[0,-8,0,-8,0,-4,0], x_ub=[1,8,1,8,1,4,2])
+        # initialize the parameter
+        parameter_lb = [0, -8, 0, -8, 0, -4, 0]
+        parameter_ub = [1, 8, 1, 8, 1, 4, 2]
         self.weights_trace = []
         self.corrections_trace = []
         self.correction_time_trace = []
-        # when case_num = 1, theta_opt = 
-        # [5.00000000e-01, 1.91107045e-10, 5.00000000e-01, -2.02184616e+00, 5.00000000e-01, -1.30708751e+00, 6.71105615e-01]
+        self.initial_parameter = 0.5 * (np.array(parameter_lb) + np.array(parameter_ub))
 
     def run(self, QuadInitialCondition: QuadStates, QuadDesiredStates: QuadStates, iter_num: int,
             time_horizon: float, save_flag: bool):
@@ -119,13 +118,16 @@ class QuadAlgorithmRealtime:
         self.ini_state = QuadInitialCondition.position + QuadInitialCondition.velocity + \
             QuadInitialCondition.attitude_quaternion + QuadInitialCondition.angular_velocity
 
-        # generate the initial weight guess
-        mve_center, mve_C = self.mve.mveSolver()
-        current_guess = mve_center
+        # set the initial parameter guess
+        current_guess = self.initial_parameter
         print("Current guess: ", current_guess)
+
+        # compute the M matrix used to generate the intended trajectory
+        inv_M = self.compute_matrix_intended_traj(time_horizon=time_horizon)
 
         # iter_num is the maximum iteration number
         for k in range(iter_num):
+            print("Computing")
             # generate the optimal trajectory based on current weights guess
             num_steps_horizon = int(time_horizon / self.time_step)
             opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=num_steps_horizon,
@@ -136,6 +138,8 @@ class QuadAlgorithmRealtime:
             state_traj = opt_sol['state_traj_opt']
             # time_traj is a numpy 1d array for timestamps
             time_traj = opt_sol['time'] * self.time_scale
+            # input_traj is a trajectory of inputs
+            input_traj = opt_sol['control_traj_opt']
 
             # save the trajectory
             traj_csv = np.vstack((time_traj, state_traj[:, 0:6].transpose()))
@@ -147,6 +151,9 @@ class QuadAlgorithmRealtime:
             # plot the execution and accept the human correction from GUI interface
             human_interface = self.env.human_interface(state_traj, obstacles=True)
 
+            # initialize the corrections over the whole horizon
+            corrections_all = np.zeros(input_traj.shape)
+
             t0 = time.time()
             if not human_interface:
                 self.weights_trace.append(current_guess)
@@ -156,18 +163,18 @@ class QuadAlgorithmRealtime:
                 self.corrections_trace.append(correction)
                 self.correction_time_trace.append(correction_time)
 
-                # generate the hyperplane from the correction information
-                hyperplane_a, hyperplane_b = self.oc.getHyperplane(opt_sol=opt_sol, correction=correction,
-                                                                   correction_time=correction_time)
-                
-                # add the hyperplane and generate the next weights guess
-                self.mve.addHyperplane(hyperplane_a, -hyperplane_b)
-                mve_center, mve_C, = self.mve.mveSolver()
-
-                # if the MVE solver is done
-                if mve_center is None:
-                    break
-                current_guess = mve_center
+                # load all the corrections into corrections_all
+                for idx in range(len(correction_time)):
+                    time_index = correction_time[idx]
+                    corrections_all[time_index] = 0.002 * correction[idx]
+                input_traj_intended = input_traj + np.matmul(inv_M, corrections_all)
+                # solve the feature vector
+                old_features = self.compute_features(input_traj, self.ini_state)
+                new_features = self.compute_features(input_traj_intended, self.ini_state)
+                # update the parameters
+                step_length = np.array([1E-8, 1E-3, 1E-8, 5E-2, 1E-8, 3E-2, 1E-2])
+                current_guess = current_guess - np.multiply(step_length, (new_features - old_features))
+                # current_guess = current_guess - 1E-3 * (new_features - old_features)
                 print("Current guess: ", current_guess)
                 self.weights_trace.append(current_guess)
 
@@ -182,3 +189,28 @@ class QuadAlgorithmRealtime:
             #             if type(event) is keyboard.Events.Press:
             #                 if event.key == keyboard.KeyCode(char='n'):
             #                     break
+
+    def compute_features(self, traj_u, init_x):
+        """
+        Define a utility function to compute features.
+        """
+        current_x = init_x
+        sum_features = 0.0
+        for u in traj_u:
+            sum_features += self.oc.feature_fn(current_x, u).full().flatten()
+            current_x = self.oc.dyn_fn(current_x, u).full().flatten()
+        return sum_features
+
+    def compute_matrix_intended_traj(self, time_horizon: float):
+        """
+        Compute the M matrix used to generate the intended trajectory.
+        """
+        horizon = int(time_horizon / self.time_step)
+        M1 = np.eye(horizon)
+        M2 = -1 * np.eye(horizon - 1)
+        M2 = np.hstack((np.zeros((horizon - 1, 1)), M2))
+        M2 = np.vstack((M2, np.zeros((1, horizon)),))
+        M = M1 + M2
+        M = M + np.transpose(M)
+        inv_M = np.linalg.inv(M)
+        return inv_M

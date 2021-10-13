@@ -9,19 +9,16 @@ import JinEnv
 from casadi import *
 import numpy as np
 import scipy.io as sio
-import matplotlib.pyplot as plt
 import math
 import time
-import transforms3d
-from dataclasses import dataclass, field
 from QuadStates import QuadStates
 from QuadPara import QuadPara
 
 
 class QuadAlgorithm:
-    QuadPara: QuadPara # the dataclass QuadPara including the quadrotor parameters
-    ini_state: list # initial states for in a 1D list, [posi, velo, quaternion, angular_velo]
-    weights_trace: list # 2D list for weights trajectory during the iteration, each sub-list is a weight vector/list
+    QuadPara: QuadPara  # the dataclass QuadPara including the quadrotor parameters
+    ini_state: list  # initial states for in a 1D list, [posi, velo, quaternion, angular_velo]
+    weights_trace: list  # 2D list for weights trajectory during the iteration, each sub-list is a weight vector/list
     corrections_trace: list
     correction_time_trace: list
 
@@ -39,13 +36,13 @@ class QuadAlgorithm:
         """
         # load environment
         self.env = JinEnv.Quadrotor()
-        self.env.initDyn(Jx=self.QuadPara.inertial_x, Jy=self.QuadPara.inertial_y, Jz=self.QuadPara.inertial_z, \
-            mass=self.QuadPara.mass, l=self.QuadPara.l, c=self.QuadPara.c)
+        self.env.initDyn(Jx=self.QuadPara.inertial_x, Jy=self.QuadPara.inertial_y, Jz=self.QuadPara.inertial_z,
+                         mass=self.QuadPara.mass, l=self.QuadPara.l, c=self.QuadPara.c)
 
         # define the cost function: weights and features
-        features = vcat([(self.env.X[0])**2, self.env.X[0], \
-            (self.env.X[1])**2, self.env.X[1], \
-                (self.env.X[2])**2, self.env.X[2], dot(self.env.U,self.env.U)])
+        features = vcat([(self.env.X[0])**2, self.env.X[0],
+                        (self.env.X[1])**2, self.env.X[1],
+                        (self.env.X[2])**2, self.env.X[2], dot(self.env.U, self.env.U)])
         weights = SX.sym('weights', features.shape)
         # define the final cost function
         self.env.initFinalCost(QuadDesiredStates)
@@ -60,14 +57,15 @@ class QuadAlgorithm:
         self.oc.setPathCost(features=features, weights=weights)
         self.oc.setFinalCost(10 * self.env.final_cost)
 
-        # initialize sthe MVE solver
+        # initialize the MVE solver
         self.mve = LFC.MVE()
-        self.mve.initSearchRegion(x_lb=[0,-8,0,-8,0,-8,0], x_ub=[1,8,1,8,1,8,0.5])
+        self.mve.initSearchRegion(x_lb=[0, -8, 0, -8, 0, -8, 0], x_ub=[1, 8, 1, 8, 1, 8, 0.5])
         self.weights_trace = []
         self.corrections_trace = []
         self.correction_time_trace = []
 
-    def run(self, QuadInitialCondition: QuadStates, QuadDesiredStates: QuadStates, iter_num: int, horizon: float, save_flag: bool):
+    def run(self, QuadInitialCondition: QuadStates, QuadDesiredStates: QuadStates, iter_num: int, time_step: float,
+            horizon: float, save_flag: bool):
         """
         Run the algorithm.
         """
@@ -86,7 +84,8 @@ class QuadAlgorithm:
         # iter_num is the maximum iteration number
         for k in range(iter_num):
             # generate the optimal trajectory based on current weights guess
-            opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=horizon, weights=current_guess)
+            opt_sol = self.oc.ocSolver(ini_state=self.ini_state, time_step=time_step, horizon=horizon,
+                                       weights=current_guess)
             state_traj = opt_sol['state_traj_opt']
             
             # plot the execution and accept the human correction from GUI interface
@@ -102,7 +101,8 @@ class QuadAlgorithm:
                 self.correction_time_trace.append(correction_time)
 
                 # generate the hyperplane from the correction information
-                hyperplane_a, hyperplane_b = self.oc.getHyperplane(opt_sol=opt_sol, correction=correction, correction_time=correction_time)
+                hyperplane_a, hyperplane_b = self.oc.getHyperplane(opt_sol=opt_sol, correction=correction,
+                                                                   correction_time=correction_time)
                 
                 # add the hyperplane and generate the next weights guess
                 self.mve.addHyperplane(hyperplane_a, -hyperplane_b)
@@ -117,12 +117,12 @@ class QuadAlgorithm:
             t1 = time.time()
             print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
-        # save the reuslts
+        # save the result
         if save_flag:
             time_prefix = time.strftime("%Y%m%d%H%M%S")
             results = {'weights_trace': self.weights_trace,
-                        'correction_time_trace': self.correction_time_trace,
-                        'corrections_trace': self.corrections_trace}
+                       'correction_time_trace': self.correction_time_trace,
+                       'corrections_trace': self.corrections_trace}
 
             # save the results as mat files
             name_prefix_mat = os.getcwd() + '/data/uav_results_random_' + time_prefix

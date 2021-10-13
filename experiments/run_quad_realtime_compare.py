@@ -7,7 +7,7 @@ sys.path.append(os.getcwd()+'/lib')
 import numpy as np
 from casadi import *
 import transforms3d
-from QuadAlgorithmRealtime import QuadAlgorithmRealtime
+from QuadAlgorithmRealtimeCompare import QuadAlgorithmRealtimeCompare
 from QuadStates import QuadStates
 from QuadPara import QuadPara
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     QuadDesiredStates.angular_velocity = [0, 0, 0]
 
     # create the quadrotor algorithm solver
-    Solver = QuadAlgorithmRealtime(QuadParaInput, time_step=0.1, time_scale=TIME_SCALE, case_num=CASE_NUM)
+    Solver = QuadAlgorithmRealtimeCompare(QuadParaInput, time_step=0.1, time_scale=TIME_SCALE, case_num=CASE_NUM)
 
     # solve
     # horizon is number of steps

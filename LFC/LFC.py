@@ -43,7 +43,7 @@ class MVE:
         theta = np.arange(-pi,pi+0.1,0.1)
         if C is not None and d is not None:
             circle = np.vstack((np.cos(theta), np.sin(theta)))
-            ellipsis = np.matmul(C,circle)+d.reshape(-1,1)
+            ellipsis = np.matmul(C, circle)+d.reshape(-1, 1)
             plt.plot(ellipsis[0], ellipsis[1])
 
         # obtain the line data
@@ -57,7 +57,7 @@ class MVE:
             else:
                 x = theta
                 y = (b-n[0]*x)/n[1]
-            lines.append( (x,y) )
+            lines.append((x, y))
 
         for line in lines:
             plt.plot(line[0],line[1])
@@ -99,17 +99,17 @@ class OCSys:
             self.control_ub = self.n_control * [1e20]
 
     def setDyn(self, ode):
-
         self.dyn = ode
         self.dyn_fn = Function('dynamics', [self.state, self.control], [self.dyn])
 
     def setPathCost(self, features, weights):
         self.weights = weights
         self.features = features
+        self.feature_fn = Function('feature_fn', [self.state, self.control], [self.features])
         self.path_cost = dot(self.features, self.weights)
         self.path_cost_fn = Function('cost', [self.state, self.control, self.weights], [self.path_cost])
 
-    def setFinalCost(self,final_cost):
+    def setFinalCost(self, final_cost):
         self.final_cost = final_cost
         self.final_cost_fn = Function('cost', [self.state], [self.final_cost])
 
@@ -189,7 +189,6 @@ class OCSys:
                    "time": time,
                    "horizon": horizon,
                    "cost": sol['f'].full()}
-
         return opt_sol
 
     def getRecoveryMat(self, opt_sol):
@@ -228,9 +227,9 @@ class OCSys:
             next_x = state_traj_opt[t + 1, :]
             next_u = control_traj_opt[t + 1, :]
             H1 = vertcat(H1 + mtimes(H2, dphix_fn(next_x, next_u).T),
-                           mtimes(dfu_fn(curr_x, curr_u).T, dphix_fn(next_x, next_u).T) + dphiu_fn(curr_x, curr_u).T)
+                         mtimes(dfu_fn(curr_x, curr_u).T, dphix_fn(next_x, next_u).T) + dphiu_fn(curr_x, curr_u).T)
             H2 = vertcat(mtimes(H2, dfx_fn(next_x, next_u).T),
-                           mtimes(dfu_fn(curr_x, curr_u).T, dfx_fn(next_x, next_u).T))
+                         mtimes(dfu_fn(curr_x, curr_u).T, dfx_fn(next_x, next_u).T))
         curr_u = control_traj_opt[-1, :]
         curr_x = state_traj_opt[-2, :]
         H1 = vertcat(H1, dphiu_fn(curr_x,curr_u).T)
@@ -238,11 +237,9 @@ class OCSys:
         final_x = state_traj_opt[-1,:]
         lam = dhx_fn(final_x).T
         H2_lam = mtimes(H2, lam)
-
         return H1.full(), H2_lam.full().flatten()
 
     def getHyperplane(self, opt_sol, correction, correction_time):
-
         H1, H2_lam = self.getRecoveryMat(opt_sol)
         if type(correction_time) is not list:
             if type(correction) is not np.array:
@@ -265,8 +262,3 @@ class OCSys:
                 vec_a += np.matmul(H1_t.T, correction_t.reshape((-1,1))).flatten()
                 b += np.dot(H2_lam_t.flatten(), correction_t.flatten())
             return vec_a, b
-
-
-
-
-
