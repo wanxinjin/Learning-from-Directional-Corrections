@@ -21,7 +21,6 @@ weights = SX.sym('weights', features.shape)
 # define the final cost
 final_cost = (env.X[0]-pi)**2+(env.X[1])**2
 
-
 # load the oc solver object
 oc = LFC.OCSys()
 oc.setStateVariable(env.X)
@@ -37,21 +36,19 @@ init_x = [0,0]
 horizon = 30
 
 # solve the optimal control problem
-true_weights = np.array([0.5,0.5,0.5,0.5])
-opt_sol = oc.ocSolver(ini_state=init_x, horizon=horizon, weights=true_weights)
+true_weights = np.array([0.5, 0.5, 0.5, 0.5])
+opt_sol = oc.ocSolver(ini_state=init_x, horizon=horizon, time_step=dt, weights=true_weights)
 
 # below the learning process which is based on the methods developed in the paper.
 # initialize the MVE solver
 mve = LFC.MVE()
-mve.initSearchRegion(x_lb=[0,0,0,0], x_ub=[5,5,5,5])
-
+mve.initSearchRegion(x_lb=[0, 0, 0, 0], x_ub=[5, 5, 5, 5])
 
 # compute the maximum iteration time
 epsilon = 1e-1
 R = 2
 r = 4
 K = np.ceil(r*log(R/epsilon)/(-log(1-1/r)))
-
 
 # generate the initial weight guess
 mve_center, mve_C, = mve.mveSolver()
@@ -61,10 +58,10 @@ corrections_trace = []
 correction_time_trace = []
 for k in range(int(K)):
     # generate the optimal trajectory based on current weights guess
-    opt_sol = oc.ocSolver(ini_state=init_x, horizon=horizon, weights=current_guess)
+    opt_sol = oc.ocSolver(ini_state=init_x, horizon=horizon, time_step=dt, weights=current_guess)
 
     # use a dummy human to generate the input data
-    correction_time = np.random.randint(1,30)
+    correction_time = np.random.randint(1, 30)
     mat_gradient1, mat_gradient2 = oc.getRecoveryMat(opt_sol=opt_sol)
     correction = -sign((np.matmul(mat_gradient1,true_weights)+mat_gradient2)[correction_time*oc.n_control:(correction_time+1)*oc.n_control])
     corrections_trace += [correction]
@@ -84,26 +81,24 @@ for k in range(int(K)):
 
     print('iter:', k, '--- current guess:', current_guess,)
 
-
 # save the reuslts
-if True:
+if False:
     time_prefix = time.strftime("%Y%m%d%H%M%S")
     results = {'weights_trace': weights_trace,
-                'true_weights': true_weights,
-                'correction_time_trace': correction_time_trace,
-                'corrections_trace': corrections_trace}
+               'true_weights': true_weights,
+               'correction_time_trace': correction_time_trace,
+               'corrections_trace': corrections_trace}
     # save the results as mat files
     name_prefix_mat = os.getcwd() + '/data/pendulum_results_' + time_prefix
     sio.savemat(name_prefix_mat + '.mat', results)
 
-
 # plot the results
 error_trace = np.linalg.norm(np.array(weights_trace)-true_weights,axis=1)**2
 params = {'axes.labelsize': 25,
-            'axes.titlesize': 25,
-            'xtick.labelsize':20,
-            'ytick.labelsize':20,
-            'legend.fontsize':16}
+          'axes.titlesize': 25,
+          'xtick.labelsize':20,
+          'ytick.labelsize':20,
+          'legend.fontsize':16}
 plt.rcParams.update(params)
 
 fig = plt.figure()
@@ -114,7 +109,6 @@ ax.set_xlabel('Iteration $k$')
 ax.set_ylabel(r'$e_{\theta}$')
 ax.set_title('Estimation error')
 ax.grid()
-ax.set_position(pos=[0.13,0.20,0.85,0.70])
-
+ax.set_position(pos=[0.13, 0.20, 0.85, 0.70])
 
 plt.show()

@@ -520,7 +520,7 @@ class RobotArm:
                     human_interactions.append(inputs)
                     print('Human action captured:', inputs)
 
-                plt.pause(0.01)
+                plt.pause(0.1)
 
             return human_interactions
 

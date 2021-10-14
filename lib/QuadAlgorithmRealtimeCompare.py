@@ -95,12 +95,12 @@ class QuadAlgorithmRealtimeCompare:
         self.oc.setFinalCost(10 * self.env.final_cost)
 
         # initialize the parameter
-        parameter_lb = [0, -8, 0, -8, 0, -4, 0]
-        parameter_ub = [1, 8, 1, 8, 1, 4, 2]
+        parameter_lb = np.array([0, -8, 0, -8, 0, -4, 0])
+        parameter_ub = np.array([1, 8, 1, 8, 1, 4, 2])
         self.weights_trace = []
         self.corrections_trace = []
         self.correction_time_trace = []
-        self.initial_parameter = 0.5 * (np.array(parameter_lb) + np.array(parameter_ub))
+        self.initial_parameter = 0.5 * (parameter_lb + parameter_ub)
 
     def run(self, QuadInitialCondition: QuadStates, QuadDesiredStates: QuadStates, iter_num: int,
             time_horizon: float, save_flag: bool):
@@ -120,14 +120,13 @@ class QuadAlgorithmRealtimeCompare:
 
         # set the initial parameter guess
         current_guess = self.initial_parameter
-        print("Current guess: ", current_guess)
+        # print("Current guess: ", current_guess)
 
         # compute the M matrix used to generate the intended trajectory
         inv_M = self.compute_matrix_intended_traj(time_horizon=time_horizon)
 
         # iter_num is the maximum iteration number
         for k in range(iter_num):
-            print("Computing")
             # generate the optimal trajectory based on current weights guess
             num_steps_horizon = int(time_horizon / self.time_step)
             opt_sol = self.oc.ocSolver(ini_state=self.ini_state, horizon=num_steps_horizon,
@@ -175,20 +174,20 @@ class QuadAlgorithmRealtimeCompare:
                 step_length = np.array([1E-8, 1E-3, 1E-8, 5E-2, 1E-8, 3E-2, 1E-2])
                 current_guess = current_guess - np.multiply(step_length, (new_features - old_features))
                 # current_guess = current_guess - 1E-3 * (new_features - old_features)
-                print("Current guess: ", current_guess)
+                # print("Current guess: ", current_guess)
                 self.weights_trace.append(current_guess)
 
             t1 = time.time()
             print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
-            # print("Press n to next iteration")
-            # while True:
-            #     with keyboard.Events() as events:
-            #         event = events.get(3)
-            #         if event is not None:
-            #             if type(event) is keyboard.Events.Press:
-            #                 if event.key == keyboard.KeyCode(char='n'):
-            #                     break
+            print("Press n to next iteration")
+            while True:
+                with keyboard.Events() as events:
+                    event = events.get(10)
+                    if event is not None:
+                        if type(event) is keyboard.Events.Press:
+                            if event.key == keyboard.KeyCode(char='n'):
+                                break
 
     def compute_features(self, traj_u, init_x):
         """

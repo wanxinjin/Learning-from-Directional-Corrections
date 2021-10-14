@@ -122,7 +122,7 @@ class QuadAlgorithmRealtime:
         # generate the initial weight guess
         mve_center, mve_C = self.mve.mveSolver()
         current_guess = mve_center
-        print("Current guess: ", current_guess)
+        # print("Current guess: ", current_guess)
 
         # iter_num is the maximum iteration number
         for k in range(iter_num):
@@ -168,17 +168,17 @@ class QuadAlgorithmRealtime:
                 if mve_center is None:
                     break
                 current_guess = mve_center
-                print("Current guess: ", current_guess)
+                # print("Current guess: ", current_guess)
                 self.weights_trace.append(current_guess)
 
             t1 = time.time()
             print("iter:", k, ", time used [sec]: ", math.floor((t1-t0)*1000)/1000.0)
 
-            # print("Press n to next iteration")
-            # while True:
-            #     with keyboard.Events() as events:
-            #         event = events.get(3)
-            #         if event is not None:
-            #             if type(event) is keyboard.Events.Press:
-            #                 if event.key == keyboard.KeyCode(char='n'):
-            #                     break
+            print("Press n to next iteration")
+            while True:
+                with keyboard.Events() as events:
+                    event = events.get(10)
+                    if event is not None:
+                        if type(event) is keyboard.Events.Press:
+                            if event.key == keyboard.KeyCode(char='n'):
+                                break
